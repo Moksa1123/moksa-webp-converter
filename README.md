@@ -35,6 +35,10 @@ python src/moksa_image_converter.py --uitest out     # 開視窗跑一輪：空�
 python src/moksa_image_converter.py --uitest out --screen 1366x768   # 模擬小螢幕
 ```
 
+## 檢查更新
+
+工具開啟時會向 `Moksa1123/moksa-webp-converter` 的 GitHub Releases 查詢最新版本（一天一次，`fetch_latest()`），有新版就在頁首下方顯示提示。所以**發版一定要推到公開 repo**，客戶才收得到通知；發版說明取自 `CHANGELOG.md` 對應版本那一段。
+
 ## 更新尺寸規格
 
 1. 修改 `data/sizes.json`（平台規格），或修改 `scripts/gen_presets.py` 裡的 `CUSTOM_TOP`（電商 SKU 規範）、`WEB_SITE`（網站）、`LINE_SPEC`（LINE）。

@@ -17,6 +17,7 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.request
 import tkinter as tk
 import tkinter.font as tkfont
 import webbrowser
@@ -53,7 +54,7 @@ IS_MAC = sys.platform == "darwin"
 
 APP_NAME = "Moksa Web"
 APP_TITLE = "Moksa Web WebP 圖片轉換工具"
-APP_VERSION = "1.4.1"
+APP_VERSION = "1.5.0"
 APP_URL = "https://moksaweb.com/"
 APP_ABOUT = ("台中的網站工程工作室。WordPress、WooCommerce、LINE 整合、n8n 與 AI 自動化、客製 ERP——"
              "從規劃、開發到上線維運，一個窗口負責到底。")
@@ -86,6 +87,11 @@ SEG = "#F0EDE6"        # 分段按鈕底色
 PANE = "#ECE9E2"       # 預覽底色
 PAPER2 = "#FBFAF7"     # 底部列
 SIM_SCREEN = None  # 介面測試用：模擬螢幕解析度 (寬, 高)
+UPDATE_REPO = "Moksa1123/moksa-webp-converter"
+UPDATE_API = f"https://api.github.com/repos/{UPDATE_REPO}/releases/latest"
+UPDATE_PAGE = f"https://github.com/{UPDATE_REPO}/releases/latest"
+UPDATE_AUTO = True          # 開啟時自動檢查（介面測試會關掉）
+UPDATE_EVERY = 24 * 3600    # 一天最多自動檢查一次
 UI_FONT = "PingFang TC" if IS_MAC else "Microsoft JhengHei UI"
 BRAND_FONT = "Space Grotesk"
 MONO_FONT = "JetBrains Mono"
@@ -191,7 +197,41 @@ DEFAULTS = {
     "base": "", "start": 1, "digits": 2, "sep": "-", "rev": 0,
     "out_mode": "subfolder", "out_dir": "",
     "keep_exif": False, "overwrite": False, "skip_larger": False, "recursive": True, "show_safe": True,
+    # 檢查更新：上次檢查時間、查到的最新版、使用者選「這版先不要」的版本
+    "update_checked": 0, "update_latest": "", "update_notes": "", "update_url": "", "update_skip": "",
 }
+
+
+# ======================= 檢查更新 =======================
+def version_tuple(v: str):
+    """'v1.4.1' → (1, 4, 1)；看不懂的回傳 ()"""
+    try:
+        return tuple(int(x) for x in v.strip().lstrip("vV").split("-")[0].split("."))
+    except ValueError:
+        return ()
+
+
+def fetch_latest(timeout: float = 3.0) -> dict:
+    """向 GitHub 問最新版本（只送出版本號查詢，不送任何使用者資料）。
+    回傳 {"tag", "notes", "url"}；失敗時 {"error": 說明}"""
+    import ssl
+    try:
+        import certifi
+        ctx = ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        ctx = ssl.create_default_context()
+    req = urllib.request.Request(UPDATE_API, headers={
+        "Accept": "application/vnd.github+json",
+        "User-Agent": f"MoksaWebImageConverter/{APP_VERSION}"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout, context=ctx) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        return {"tag": d.get("tag_name", ""), "notes": (d.get("body") or "").strip(),
+                "url": d.get("html_url") or UPDATE_PAGE}
+    except urllib.error.HTTPError as e:
+        return {"error": f"HTTP {e.code}"}
+    except Exception as e:
+        return {"error": type(e).__name__ + ": " + str(e)[:120]}
 
 
 # ======================= 影像處理 =======================
@@ -735,6 +775,8 @@ class App(RootBase):
             self.lbl_drop_title.configure(text="按下面的按鈕加入圖片")
         self._refresh_list()
         self.after(100, self._poll)
+        if UPDATE_AUTO:
+            self.after(1500, self._auto_check_update)
         self.deiconify()
 
     # ---------- 外觀 ----------
@@ -860,6 +902,7 @@ class App(RootBase):
         about.bind("<Button-1>", lambda e: self.show_about())
         tk.Label(rt, text=f"v{APP_VERSION}   ", font=(self.mono_font, fs(8)), fg=DARK_MUTED, bg=DARK).pack(side="right")
         tk.Frame(self, bg=BRAND, height=max(2, int(3 * k))).pack(fill="x")
+        self._build_update_bar()
 
         # 底部列：閒置時顯示摘要，轉換中才出現進度條與「停止」
         foot = tk.Frame(self, bg=PAPER2, padx=int(20 * k), pady=int(10 * k))
@@ -877,7 +920,7 @@ class App(RootBase):
         self.pb = ttk.Progressbar(self.prog, mode="determinate")
         self.pb.pack(side="left", fill="x", expand=True, padx=(int(12 * k), int(12 * k)))
 
-        body = ttk.Frame(self, padding=(int(20 * k), int(14 * k), int(20 * k), int(10 * k)))
+        body = self.body_frame = ttk.Frame(self, padding=(int(20 * k), int(14 * k), int(20 * k), int(10 * k)))
         body.pack(fill="both", expand=True)
         body.columnconfigure(0, weight=1)
         body.rowconfigure(0, weight=1)
@@ -1011,7 +1054,7 @@ class App(RootBase):
                           ("out", "輸出檔名", "w"), ("status", "狀態", "w")):
             self.tree.heading(c, text=t, anchor=anc)
             self.tree.column(c, anchor=anc, stretch=c in ("name", "out"))
-        self.thumb_col = int((86 if IS_MAC else 64) * k)  # Mac 的清單在圖片前多縮排約 20px
+        self.thumb_col = int(86 * k)  # 清單在圖片前會先縮排一段（Mac、Windows 縮放 125% 都有），欄寬要留夠
         self.tree.column("#0", width=self.thumb_col, stretch=False, anchor="center")
         self.tree.tag_configure("warn", foreground="#A15C07")
         self.tree.tag_configure("err", foreground=DANGER)
@@ -1925,6 +1968,8 @@ class App(RootBase):
                         iid = str(self.files.index(p))
                         if self.tree.exists(iid):
                             self.tree.item(iid, image=ph)
+                elif kind == "update":
+                    self._on_update_result(msg[1], msg[2])
                 elif kind == "status":
                     self._set_status(msg[1], msg[2], msg[3])
                 elif kind == "status_if":
@@ -2036,6 +2081,110 @@ class App(RootBase):
         w.transient(self)
         w.focus_set()
 
+    # ---------- 檢查更新 ----------
+    def _build_update_bar(self):
+        """頁首下方的橘色提示列：有新版本時才出現"""
+        k = self.k
+        bar = self.update_bar = tk.Frame(self, bg=TINT, padx=int(20 * k), pady=int(7 * k))
+        tk.Frame(bar, bg=BRAND, width=int(4 * k)).pack(side="left", fill="y", padx=(0, int(10 * k)))
+        self.lbl_update = tk.Label(bar, bg=TINT, fg=INK, font=(UI_FONT, fs(10), "bold"), anchor="w")
+        self.lbl_update.pack(side="left")
+
+        def link(text, cmd, color=ACCENT, bold=False):
+            lb = tk.Label(bar, text=text, bg=TINT, fg=color, cursor="hand2",
+                          font=(UI_FONT, fs(10), "bold" if bold else "normal"))
+            lb.bind("<Button-1>", lambda e: cmd())
+            return lb
+        link("✕", self._hide_update_bar, MUTED).pack(side="right")
+        link("這版先不要", self._skip_update, MUTED).pack(side="right", padx=(0, int(16 * k)))
+        self.btn_update_dl = ttk.Button(bar, text="下載新版", style="Accent.TButton", command=self._open_update_page)
+        self.btn_update_dl.pack(side="right", padx=(0, int(16 * k)))
+        link("看更新內容", self._show_update_notes).pack(side="right", padx=(0, int(16 * k)))
+        self._update_info = None
+
+    def _auto_check_update(self):
+        s = self.s
+        if time.time() - float(s.get("update_checked") or 0) < UPDATE_EVERY:
+            # 一天內查過：直接用上次查到的結果
+            if s.get("update_latest"):
+                self._on_update_result({"tag": s["update_latest"], "notes": s.get("update_notes", ""),
+                                        "url": s.get("update_url") or UPDATE_PAGE}, manual=False)
+            return
+        threading.Thread(target=lambda: self.q.put(("update", fetch_latest(), False)), daemon=True).start()
+
+    def check_update_now(self, label=None):
+        """「關於」視窗的「檢查更新」按鈕"""
+        self._about_update_label = label
+        if label is not None:
+            label.configure(text="檢查中…")
+        threading.Thread(target=lambda: self.q.put(("update", fetch_latest(timeout=6), True)), daemon=True).start()
+
+    def _on_update_result(self, res, manual):
+        lbl = getattr(self, "_about_update_label", None) if manual else None
+        try:
+            lbl = lbl if lbl is not None and lbl.winfo_exists() else None
+        except tk.TclError:
+            lbl = None
+        if "error" in res:
+            if lbl is not None:
+                lbl.configure(text="無法連線檢查更新（請確認網路），可以直接到下載頁查看。")
+            return
+        self.s.update(update_checked=time.time(), update_latest=res["tag"], update_notes=res["notes"],
+                      update_url=res["url"])
+        save_settings(self.s)
+        newer = version_tuple(res["tag"]) > version_tuple(APP_VERSION)
+        if lbl is not None:
+            lbl.configure(text=f"有新版本 {res['tag']}，可以按頁首的「下載新版」。" if newer
+                          else f"目前已是最新版本（v{APP_VERSION}）。")
+        if newer and (manual or self.s.get("update_skip") != res["tag"]):
+            self._show_update_bar(res)
+
+    def _show_update_bar(self, res):
+        self._update_info = res
+        self.lbl_update.configure(text=f"有新版本 {res['tag']} 可以下載（目前 v{APP_VERSION}）")
+        if not self.update_bar.winfo_manager():
+            self.update_bar.pack(fill="x", before=self.body_frame)
+
+    def _hide_update_bar(self):
+        self.update_bar.pack_forget()
+
+    def _skip_update(self):
+        if self._update_info:
+            self.s["update_skip"] = self._update_info["tag"]
+            save_settings(self.s)
+        self._hide_update_bar()
+
+    def _open_update_page(self):
+        webbrowser.open((self._update_info or {}).get("url") or UPDATE_PAGE)
+
+    def _show_update_notes(self):
+        info = self._update_info or {}
+        k = self.k
+        w = tk.Toplevel(self)
+        w.title(f"{info.get('tag', '')} 更新內容")
+        w.configure(bg=PAPER)
+        w.transient(self)
+        box = tk.Frame(w, bg=PAPER, padx=int(20 * k), pady=int(16 * k))
+        box.pack(fill="both", expand=True)
+        tk.Label(box, text=f"新版本 {info.get('tag', '')}", bg=PAPER, fg=INK,
+                 font=(UI_FONT, fs(13), "bold")).pack(anchor="w")
+        tk.Label(box, text=f"目前使用 v{APP_VERSION}", bg=PAPER, fg=MUTED, font=(UI_FONT, fs(9))).pack(anchor="w")
+        t = tk.Text(box, width=64, height=14, wrap="word", relief="flat", bg=CARD, fg=INK, padx=10, pady=8,
+                    font=(UI_FONT, fs(10)))
+        t.insert("1.0", info.get("notes") or "（這個版本沒有寫更新說明）")
+        t.configure(state="disabled")
+        t.pack(fill="both", expand=True, pady=(int(10 * k), int(12 * k)))
+        row = tk.Frame(box, bg=PAPER)
+        row.pack(fill="x")
+        ttk.Button(row, text="關閉", command=w.destroy).pack(side="right")
+        ttk.Button(row, text="下載新版", style="Accent.TButton",
+                   command=lambda: (self._open_update_page(), w.destroy())).pack(side="right", padx=(0, 8))
+        w.bind("<Escape>", lambda e: w.destroy())
+        w.update_idletasks()
+        x = self.winfo_rootx() + (self.winfo_width() - w.winfo_width()) // 2
+        y = self.winfo_rooty() + (self.winfo_height() - w.winfo_height()) // 3
+        w.geometry(f"+{x}+{y}")
+
     def show_about(self):
         k = self.k
         w = tk.Toplevel(self)
@@ -2070,7 +2219,13 @@ class App(RootBase):
                         cursor="hand2")
         link.pack(pady=(12, 0))
         link.bind("<Button-1>", lambda e: webbrowser.open(APP_URL))
-        ttk.Button(box, text="關閉", command=w.destroy).pack(pady=(14, 0))
+        upd = tk.Label(box, text="", font=(UI_FONT, fs(9)), fg=DARK_MUTED, bg=DARK, wraplength=int(360 * k),
+                       justify="center")
+        btns = tk.Frame(box, bg=DARK)
+        btns.pack(pady=(14, 0))
+        ttk.Button(btns, text="檢查更新", command=lambda: self.check_update_now(upd)).pack(side="left", padx=(0, 8))
+        ttk.Button(btns, text="關閉", command=w.destroy).pack(side="left")
+        upd.pack(pady=(8, 0))
         w.update_idletasks()
         x = self.winfo_rootx() + (self.winfo_width() - w.winfo_width()) // 2
         y = self.winfo_rooty() + (self.winfo_height() - w.winfo_height()) // 3
@@ -2121,7 +2276,8 @@ def uitest(out_dir: str, screen: str = "") -> int:
     """開視窗的介面測試（CI 用）：檢查拖放元件、字型、主題與各狀態的版面，截圖後自動關閉。
     用暫存的設定檔，不會改到使用者自己的設定。"""
     from PIL import ImageGrab
-    global SIM_SCREEN, SETTINGS_FILE
+    global SIM_SCREEN, SETTINGS_FILE, UPDATE_AUTO
+    UPDATE_AUTO = False
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     tag = ""
@@ -2279,6 +2435,31 @@ def uitest(out_dir: str, screen: str = "") -> int:
 
     def step4():
         shot(f"7-關於{tag}.png")
+        # 更新提示列（用假資料，不連網）
+        for c in app.winfo_children():
+            if isinstance(c, tk.Toplevel):
+                c.destroy()
+        app._on_update_result({"tag": "v9.9.9", "notes": "- 測試用的更新說明第一行\n- 第二行",
+                               "url": UPDATE_PAGE}, manual=False)
+        app.update()
+        check("更新提示列：有新版時出現", app.update_bar.winfo_ismapped() and "v9.9.9" in app.lbl_update.cget("text"))
+        check("更新提示列：「下載新版」看得到", visible(app.btn_update_dl))
+        shot(f"8-更新提示{tag}.png")
+        app._skip_update()
+        app.update()
+        app._on_update_result({"tag": "v9.9.9", "notes": "", "url": UPDATE_PAGE}, manual=False)
+        app.update()
+        check("「這版先不要」之後不再提醒同一版", not app.update_bar.winfo_ismapped())
+        app._on_update_result({"tag": f"v{APP_VERSION}", "notes": "", "url": UPDATE_PAGE}, manual=False)
+        check("已是最新版時不出現", not app.update_bar.winfo_ismapped())
+        # 真的連線一次：確認打包後的 HTTPS 憑證可用（GitHub 限流時只記注意）
+        res = fetch_latest(timeout=10)
+        if "error" not in res:
+            check("連線檢查更新（HTTPS）", bool(version_tuple(res["tag"])), f"最新版 {res['tag']}")
+        elif res["error"].startswith("HTTP 403") or res["error"].startswith("HTTP 429"):
+            lines.append(f"注意 檢查更新被 GitHub 限流：{res['error']}")
+        else:
+            check("連線檢查更新（HTTPS）", False, res["error"])
         app.after(100, app.destroy)
 
     app.attributes("-topmost", True)  # 截圖時不被其他視窗擋住

@@ -162,6 +162,15 @@ jobs:
     needs: [windows, macos]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+      - name: 從 CHANGELOG 取出這一版的說明（工具裡「看更新內容」也是顯示這段）
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v v="$v" 'index($0, "## v" v "（") == 1 {f=1; next} /^## v/ {if (f) exit} f' CHANGELOG.md > notes.md
+          echo "" >> notes.md
+          echo "---" >> notes.md
+          echo "Windows 下載 …-windows.zip；Mac 依晶片下載 …-mac-arm64.dmg（Apple 晶片）或 …-mac-x86_64.dmg（Intel）。" >> notes.md
+          cat notes.md
       - uses: actions/download-artifact@v8
         with:
           path: out
@@ -170,4 +179,4 @@ jobs:
       - uses: softprops/action-gh-release@v3
         with:
           files: out/*
-          generate_release_notes: true
+          body_path: notes.md
