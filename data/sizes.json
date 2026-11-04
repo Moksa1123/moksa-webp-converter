@@ -1,0 +1,1541 @@
+{
+ "checked": "2026-10-02",
+ "legend": {
+  "official": "Number stated on the platform's own help / developer page (see source)",
+  "widely-cited": "Platform gives only a ratio or minimum, or its page could not be verified; the pixel size is the industry-standard choice",
+  "project": "Verified in production (upload accepted, displayed without crop)"
+ },
+ "sizes": [
+  {
+   "id": "ig_feed_square",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Feed post, square",
+   "name_zh": "IG 貼文 方形",
+   "w": 1080,
+   "h": 1080,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "IG stores photos at a maximum width of 1080px. Ratios from 1.91:1 to 3:4 are kept uncropped. Since 2025 the profile grid shows 3:4 tiles, so square posts are cropped at the sides there.",
+   "source": "https://help.instagram.com/1631821640426723",
+   "confidence": "official",
+   "tags": "ig 貼文 feed square 方形"
+  },
+  {
+   "id": "ig_feed_portrait_4x5",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Feed post, portrait 4:5",
+   "name_zh": "IG 貼文 直式 4:5",
+   "w": 1080,
+   "h": 1350,
+   "ratio": "4:5",
+   "safe": [
+    0,
+    45,
+    0,
+    45
+   ],
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Standard portrait post. The 3:4 profile-grid tile trims about 45px from each end, so keep text inside.",
+   "source": "https://help.instagram.com/1631821640426723",
+   "confidence": "official",
+   "tags": "ig 貼文 feed portrait 直式"
+  },
+  {
+   "id": "ig_feed_portrait_3x4",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Feed post, portrait 3:4 (matches profile grid)",
+   "name_zh": "IG 貼文 直式 3:4（個人頁格狀不裁）",
+   "w": 1080,
+   "h": 1440,
+   "ratio": "3:4",
+   "safe": null,
+   "max_kb": 8000,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Tallest ratio kept uncropped. Matches the 3:4 profile grid introduced in January 2025, so it shows uncropped in both the feed and the grid.",
+   "source": "https://help.instagram.com/1631821640426723",
+   "confidence": "official",
+   "tags": "ig 貼文 feed portrait 3:4 直式 格狀"
+  },
+  {
+   "id": "ig_feed_landscape",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Feed post, landscape",
+   "name_zh": "IG 貼文 橫式",
+   "w": 1080,
+   "h": 566,
+   "ratio": "1.91:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Widest uncropped ratio. It shows small in the feed and is heavily center-cropped in the 3:4 grid.",
+   "source": "https://help.instagram.com/1631821640426723",
+   "confidence": "official",
+   "tags": "ig 貼文 landscape 橫式"
+  },
+  {
+   "id": "ig_feed_ad_4x5",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Feed ad 4:5 (Meta Ads Guide)",
+   "name_zh": "IG 動態廣告 4:5",
+   "w": 1440,
+   "h": 1800,
+   "ratio": "4:5",
+   "safe": null,
+   "max_kb": 30720,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Current recommendation in the Meta Ads Guide. Minimum width is 500px and ratio tolerance is 1%.",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/instagram-feed",
+   "confidence": "official",
+   "tags": "ig 廣告 ad feed"
+  },
+  {
+   "id": "ig_story_reel",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Stories / Reels 9:16",
+   "name_zh": "IG 限動／Reels 9:16",
+   "w": 1080,
+   "h": 1920,
+   "ratio": "9:16",
+   "safe": [
+    65,
+    269,
+    65,
+    672
+   ],
+   "max_kb": 8000,
+   "formats": [
+    "jpg",
+    "png",
+    "mp4"
+   ],
+   "note_en": "Safe zone follows Meta's unified 9:16 margins: keep out of the top 14%, bottom 35% and 6% on each side. For a still image story without a caption bar, the production-verified safe zone is the tighter L50 T250 R50 B270.",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/instagram-story",
+   "confidence": "widely-cited",
+   "tags": "ig story 限動 reels 9:16"
+  },
+  {
+   "id": "ig_story_measured",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Story, still image (verified safe zone)",
+   "name_zh": "IG 限動 靜態圖（實測安全區）",
+   "w": 1080,
+   "h": 1920,
+   "ratio": "9:16",
+   "safe": [
+    50,
+    250,
+    50,
+    270
+   ],
+   "max_kb": 8000,
+   "formats": [
+    "jpg"
+   ],
+   "note_en": "Measured on still-image stories: the top 250px (progress bar and avatar) and bottom 270px (reply bar) are covered by the interface.",
+   "source": "project: marketing/product-images/tools/common.py",
+   "confidence": "project",
+   "tags": "ig story 限動 實測"
+  },
+  {
+   "id": "ig_story_ad",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Stories ad 9:16 (Meta Ads Guide)",
+   "name_zh": "IG 限動廣告 9:16",
+   "w": 1440,
+   "h": 2560,
+   "ratio": "9:16",
+   "safe": [
+    86,
+    358,
+    86,
+    896
+   ],
+   "max_kb": 30720,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Keep text and logos out of the top 14%, bottom 35% and 6% on each side.",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/instagram-story",
+   "confidence": "official",
+   "tags": "ig story 限動 廣告 ad"
+  },
+  {
+   "id": "ig_reels_cover",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Reels cover",
+   "name_zh": "IG Reels 封面",
+   "w": 1080,
+   "h": 1920,
+   "ratio": "9:16",
+   "safe": [
+    0,
+    240,
+    0,
+    240
+   ],
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "The profile grid shows a centered 1080x1440 crop, so keep the title inside the middle 3:4.",
+   "source": "https://www.lilachbullock.com/instagram-reels-cover-size/",
+   "confidence": "widely-cited",
+   "tags": "ig reels cover 封面"
+  },
+  {
+   "id": "ig_profile",
+   "group": "Instagram",
+   "platform": "Instagram",
+   "name_en": "Profile photo",
+   "name_zh": "IG 大頭貼",
+   "w": 320,
+   "h": 320,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Shown as a circle, so keep the logo centered. Uploading 720px or larger stays sharper.",
+   "source": "https://postfa.st/sizes/instagram/profile",
+   "confidence": "widely-cited",
+   "tags": "ig profile 大頭貼 avatar"
+  },
+  {
+   "id": "fb_feed_portrait",
+   "group": "Facebook",
+   "platform": "Facebook",
+   "name_en": "Feed image 4:5",
+   "name_zh": "FB 貼文 直式 4:5",
+   "w": 1440,
+   "h": 1800,
+   "ratio": "4:5",
+   "safe": null,
+   "max_kb": 30720,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Meta Ads Guide recommendation. Minimum 600x750.",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/facebook-feed",
+   "confidence": "official",
+   "tags": "fb facebook 貼文 feed portrait"
+  },
+  {
+   "id": "fb_feed_square",
+   "group": "Facebook",
+   "platform": "Facebook",
+   "name_en": "Feed image, square",
+   "name_zh": "FB 貼文 方形",
+   "w": 1080,
+   "h": 1080,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Common size for organic square posts.",
+   "source": "https://blog.hootsuite.com/social-media-image-sizes-guide/",
+   "confidence": "widely-cited",
+   "tags": "fb facebook 貼文 square"
+  },
+  {
+   "id": "fb_link_share",
+   "group": "Facebook",
+   "platform": "Facebook",
+   "name_en": "Link share image",
+   "name_zh": "FB 連結分享圖",
+   "w": 1200,
+   "h": 630,
+   "ratio": "1.91:1",
+   "safe": null,
+   "max_kb": 8192,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "At least 1200x630 for high-resolution screens. The large link layout needs at least 600x315.",
+   "source": "https://developers.facebook.com/docs/sharing/webmasters/images/",
+   "confidence": "official",
+   "tags": "fb facebook link share 分享 og"
+  },
+  {
+   "id": "fb_page_cover",
+   "group": "Facebook",
+   "platform": "Facebook",
+   "name_en": "Page cover",
+   "name_zh": "FB 粉專封面",
+   "w": 851,
+   "h": 315,
+   "ratio": "2.7:1",
+   "safe": null,
+   "max_kb": 100,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "sRGB JPG under 100KB loads fastest. Phones crop the sides (the visible area is about 640x360), so keep the center readable.",
+   "source": "https://www.facebook.com/help/125379114252045",
+   "confidence": "official",
+   "tags": "fb facebook cover 封面 粉專"
+  },
+  {
+   "id": "fb_profile",
+   "group": "Facebook",
+   "platform": "Facebook",
+   "name_en": "Page profile picture",
+   "name_zh": "FB 粉專大頭貼",
+   "w": 320,
+   "h": 320,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Displays at 176px on desktop and 196px on phones, cropped to a circle.",
+   "source": "https://www.facebook.com/help/125379114252045",
+   "confidence": "official",
+   "tags": "fb facebook profile 大頭貼"
+  },
+  {
+   "id": "fb_event_cover",
+   "group": "Facebook",
+   "platform": "Facebook",
+   "name_en": "Event cover",
+   "name_zh": "FB 活動封面",
+   "w": 1920,
+   "h": 1005,
+   "ratio": "1.91:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Changed from 1920x1080 around 2024.",
+   "source": "https://www.typeform.com/blog/facebook-event-photo-size",
+   "confidence": "widely-cited",
+   "tags": "fb facebook event 活動"
+  },
+  {
+   "id": "fb_group_cover",
+   "group": "Facebook",
+   "platform": "Facebook",
+   "name_en": "Group cover",
+   "name_zh": "FB 社團封面",
+   "w": 1640,
+   "h": 856,
+   "ratio": "1.91:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Edges are cropped on phones, so keep text centered.",
+   "source": "https://snappa.com/blog/facebook-group-cover-photo-size/",
+   "confidence": "widely-cited",
+   "tags": "fb facebook group 社團"
+  },
+  {
+   "id": "fb_story",
+   "group": "Facebook",
+   "platform": "Facebook",
+   "name_en": "Stories 9:16",
+   "name_zh": "FB 限動 9:16",
+   "w": 1440,
+   "h": 2560,
+   "ratio": "9:16",
+   "safe": [
+    86,
+    358,
+    86,
+    896
+   ],
+   "max_kb": 30720,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Same safe zone as Instagram: 14% top, 35% bottom, 6% on each side.",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/facebook-story",
+   "confidence": "official",
+   "tags": "fb facebook story 限動"
+  },
+  {
+   "id": "og_image",
+   "group": "Web / Open Graph",
+   "platform": "Open Graph",
+   "name_en": "og:image (link preview)",
+   "name_zh": "OG 分享圖（網頁連結預覽）",
+   "w": 1200,
+   "h": 630,
+   "ratio": "1.91:1",
+   "safe": [
+    135,
+    0,
+    135,
+    0
+   ],
+   "max_kb": 8192,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "One image covers Facebook, LINE, Slack and most link previews. Some apps crop to 2:1 or 1:1, so keep the key content in the center 930px.",
+   "source": "https://developers.facebook.com/docs/sharing/webmasters/images/",
+   "confidence": "official",
+   "tags": "og ogimage og:image 分享 預覽 網頁 seo line"
+  },
+  {
+   "id": "email_header",
+   "group": "Web / Open Graph",
+   "platform": "Email",
+   "name_en": "Email header",
+   "name_zh": "電子報頁首",
+   "w": 1200,
+   "h": 400,
+   "ratio": "3:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png",
+    "gif"
+   ],
+   "note_en": "Email content is 600px wide, exported here at 2x for retina screens. Keep the file small.",
+   "source": "https://blog.hootsuite.com/social-media-image-sizes-guide/",
+   "confidence": "widely-cited",
+   "tags": "email 電子報 edm newsletter"
+  },
+  {
+   "id": "x_card_large",
+   "group": "X / Threads",
+   "platform": "X (Twitter)",
+   "name_en": "summary_large_image card",
+   "name_zh": "X 大圖卡片",
+   "w": 1200,
+   "h": 600,
+   "ratio": "2:1",
+   "safe": null,
+   "max_kb": 5120,
+   "formats": [
+    "jpg",
+    "png",
+    "webp",
+    "gif"
+   ],
+   "note_en": "Card ratio is 2:1, minimum 300x157, under 5MB.",
+   "source": "https://developer.x.com/en/docs/x-for-websites/cards/overview/summary-card-with-large-image",
+   "confidence": "widely-cited",
+   "tags": "x twitter card 卡片"
+  },
+  {
+   "id": "x_post_16x9",
+   "group": "X / Threads",
+   "platform": "X (Twitter)",
+   "name_en": "In-stream image 16:9",
+   "name_zh": "X 貼文圖 16:9",
+   "w": 1200,
+   "h": 675,
+   "ratio": "16:9",
+   "safe": null,
+   "max_kb": 5120,
+   "formats": [
+    "jpg",
+    "png",
+    "webp"
+   ],
+   "note_en": "Shows uncropped in the timeline.",
+   "source": "https://postfa.st/sizes/x/posts",
+   "confidence": "widely-cited",
+   "tags": "x twitter post 貼文"
+  },
+  {
+   "id": "x_header",
+   "group": "X / Threads",
+   "platform": "X (Twitter)",
+   "name_en": "Profile header",
+   "name_zh": "X 頁首橫幅",
+   "w": 1500,
+   "h": 500,
+   "ratio": "3:1",
+   "safe": [
+    0,
+    60,
+    0,
+    60
+   ],
+   "max_kb": 5120,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Top and bottom can be cropped, and the avatar covers the lower left.",
+   "source": "https://help.x.com/en/managing-your-account/common-issues-when-uploading-profile-photo",
+   "confidence": "widely-cited",
+   "tags": "x twitter header 橫幅"
+  },
+  {
+   "id": "threads_post",
+   "group": "X / Threads",
+   "platform": "Threads",
+   "name_en": "Post image 4:5",
+   "name_zh": "Threads 貼文 4:5",
+   "w": 1080,
+   "h": 1350,
+   "ratio": "4:5",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "No official size page. Threads handles images much like Instagram.",
+   "source": "https://buffer.com/resources/social-media-image-sizes/",
+   "confidence": "widely-cited",
+   "tags": "threads 脆"
+  },
+  {
+   "id": "line_rich_message",
+   "group": "LINE",
+   "platform": "LINE Official Account",
+   "name_en": "Rich message (square)",
+   "name_zh": "LINE 圖文訊息 方形",
+   "w": 1040,
+   "h": 1040,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 10240,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Width is fixed at 1040px; custom heights are allowed.",
+   "source": "https://blog.wenk-media.com/?p=3613",
+   "confidence": "widely-cited",
+   "tags": "line 圖文訊息 rich message"
+  },
+  {
+   "id": "line_rich_menu_large",
+   "group": "LINE",
+   "platform": "LINE Official Account",
+   "name_en": "Rich menu, large",
+   "name_zh": "LINE 圖文選單 大型",
+   "w": 2500,
+   "h": 1686,
+   "ratio": "1.48:1",
+   "safe": null,
+   "max_kb": 1024,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Width 800 to 2500px, width/height of at least 1.45, file 1MB or less.",
+   "source": "https://developers.line.biz/en/docs/messaging-api/using-rich-menus/",
+   "confidence": "official",
+   "tags": "line 圖文選單 rich menu"
+  },
+  {
+   "id": "line_rich_menu_compact",
+   "group": "LINE",
+   "platform": "LINE Official Account",
+   "name_en": "Rich menu, compact",
+   "name_zh": "LINE 圖文選單 小型",
+   "w": 2500,
+   "h": 843,
+   "ratio": "2.97:1",
+   "safe": null,
+   "max_kb": 1024,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Template size in LINE Official Account Manager.",
+   "source": "https://www.pongo.com.tw/line-pixel-dimensions/",
+   "confidence": "widely-cited",
+   "tags": "line 圖文選單 rich menu compact"
+  },
+  {
+   "id": "pinterest_pin",
+   "group": "Pinterest / YouTube / TikTok",
+   "platform": "Pinterest",
+   "name_en": "Standard pin 2:3",
+   "name_zh": "Pinterest 標準 Pin",
+   "w": 1000,
+   "h": 1500,
+   "ratio": "2:3",
+   "safe": null,
+   "max_kb": 20480,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Pins taller than 2:3 may be cut off in feeds.",
+   "source": "https://help.pinterest.com/en/business/article/pinterest-product-specs",
+   "confidence": "official",
+   "tags": "pinterest pin"
+  },
+  {
+   "id": "youtube_thumbnail",
+   "group": "Pinterest / YouTube / TikTok",
+   "platform": "YouTube",
+   "name_en": "Video thumbnail",
+   "name_zh": "YouTube 影片縮圖",
+   "w": 1280,
+   "h": 720,
+   "ratio": "16:9",
+   "safe": [
+    0,
+    0,
+    200,
+    100
+   ],
+   "max_kb": 2048,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "The video length overlays the lower right, so keep text out of that corner.",
+   "source": "https://support.google.com/youtube/answer/72431",
+   "confidence": "widely-cited",
+   "tags": "youtube yt thumbnail 縮圖"
+  },
+  {
+   "id": "youtube_banner",
+   "group": "Pinterest / YouTube / TikTok",
+   "platform": "YouTube",
+   "name_en": "Channel banner",
+   "name_zh": "YouTube 頻道橫幅",
+   "w": 2560,
+   "h": 1440,
+   "ratio": "16:9",
+   "safe": [
+    507,
+    508,
+    507,
+    509
+   ],
+   "max_kb": 6144,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Phones show only the centered 1546x423 area.",
+   "source": "https://support.google.com/youtube/answer/12950272",
+   "confidence": "official",
+   "tags": "youtube yt banner 橫幅"
+  },
+  {
+   "id": "tiktok_video",
+   "group": "Pinterest / YouTube / TikTok",
+   "platform": "TikTok",
+   "name_en": "Video / cover 9:16",
+   "name_zh": "TikTok 影片／封面",
+   "w": 1080,
+   "h": 1920,
+   "ratio": "9:16",
+   "safe": [
+    60,
+    130,
+    140,
+    484
+   ],
+   "max_kb": null,
+   "formats": [
+    "mp4",
+    "jpg"
+   ],
+   "note_en": "The buttons take the right side and the caption takes the bottom. TikTok publishes no universal pixel safe zone; these are commonly used values.",
+   "source": "https://ads.tiktok.com/help/article/tiktok-auction-in-feed-ads",
+   "confidence": "widely-cited",
+   "tags": "tiktok 抖音"
+  },
+  {
+   "id": "woo_desc",
+   "group": "E-commerce (TW)",
+   "platform": "WooCommerce",
+   "name_en": "Product description image",
+   "name_zh": "Woo 商品描述圖",
+   "w": 1000,
+   "h": 1000,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 400,
+   "formats": [
+    "webp",
+    "jpg"
+   ],
+   "note_en": "Width 1000px; height can go up to 1800px. Keep text off the product main image, because Google Merchant Center rejects images with text.",
+   "source": "project: marketing/product-images/tools/common.py",
+   "confidence": "project",
+   "tags": "woo woocommerce 描述 電商 官網 ecommerce"
+  },
+  {
+   "id": "gmc_product",
+   "group": "E-commerce (Global)",
+   "platform": "Google Merchant Center",
+   "name_en": "Product image",
+   "name_zh": "Google 購物商品圖",
+   "w": 1500,
+   "h": 1500,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 16384,
+   "formats": [
+    "jpg",
+    "png",
+    "webp"
+   ],
+   "note_en": "About 1500x1500 is recommended. From 2027-01-31 every product needs at least 500x500. No text, watermarks or promotional overlays.",
+   "source": "https://support.google.com/merchants/answer/6324350",
+   "confidence": "official",
+   "tags": "google gmc 購物 shopping 商品 電商 ecommerce"
+  },
+  {
+   "id": "amazon_main",
+   "group": "E-commerce (Global)",
+   "platform": "Amazon",
+   "name_en": "Main image (zoom)",
+   "name_zh": "Amazon 主圖",
+   "w": 1600,
+   "h": 1600,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 10240,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "1000px or more turns on zoom. Pure white background, with the product filling about 85% of the frame.",
+   "source": "https://www.junglescout.com/resources/articles/amazon-image-requirements/",
+   "confidence": "widely-cited",
+   "tags": "amazon 亞馬遜 主圖 電商 ecommerce"
+  },
+  {
+   "id": "amazon_aplus_header",
+   "group": "E-commerce (Global)",
+   "platform": "Amazon",
+   "name_en": "A+ full-width header",
+   "name_zh": "Amazon A+ 滿版",
+   "w": 970,
+   "h": 600,
+   "ratio": "97:60",
+   "safe": null,
+   "max_kb": 2048,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Basic A+ module. A 970x300 banner version also exists.",
+   "source": "https://www.growthjockey.com/blogs/guide-to-amazon-a-plus-content-examples-and-image-dimension-guidelines",
+   "confidence": "widely-cited",
+   "tags": "amazon a+ 亞馬遜 電商 ecommerce"
+  },
+  {
+   "id": "amazon_aplus_premium",
+   "group": "E-commerce (Global)",
+   "platform": "Amazon",
+   "name_en": "Premium A+ full-width",
+   "name_zh": "Amazon Premium A+",
+   "w": 1464,
+   "h": 600,
+   "ratio": "2.44:1",
+   "safe": null,
+   "max_kb": 2048,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Needs a separate 600x450 mobile image.",
+   "source": "https://www.growthjockey.com/blogs/guide-to-amazon-a-plus-content-examples-and-image-dimension-guidelines",
+   "confidence": "widely-cited",
+   "tags": "amazon a+ premium 電商 ecommerce"
+  },
+  {
+   "id": "shopify_product",
+   "group": "E-commerce (Global)",
+   "platform": "Shopify",
+   "name_en": "Product image",
+   "name_zh": "Shopify 商品圖",
+   "w": 2048,
+   "h": 2048,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 20480,
+   "formats": [
+    "jpg",
+    "png",
+    "webp"
+   ],
+   "note_en": "Shopify says 2048x2048 usually displays best.",
+   "source": "https://help.shopify.com/en/manual/products/product-media/product-media-types",
+   "confidence": "official",
+   "tags": "shopify 商品 電商 ecommerce"
+  },
+  {
+   "id": "etsy_listing",
+   "group": "E-commerce (Global)",
+   "platform": "Etsy",
+   "name_en": "Listing photo",
+   "name_zh": "Etsy 商品照",
+   "w": 2000,
+   "h": 2000,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 1024,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "At least 2000px on both sides is recommended. The first photo is cropped into the thumbnail. Transparent PNGs turn black.",
+   "source": "https://help.etsy.com/hc/en-us/articles/115015663347",
+   "confidence": "official",
+   "tags": "etsy 商品 電商 ecommerce"
+  },
+  {
+   "id": "etsy_banner",
+   "group": "E-commerce (Global)",
+   "platform": "Etsy",
+   "name_en": "Big shop banner",
+   "name_zh": "Etsy 店舖大橫幅",
+   "w": 1600,
+   "h": 400,
+   "ratio": "4:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Minimum 1200x300.",
+   "source": "https://help.etsy.com/hc/en-us/articles/115015663347",
+   "confidence": "official",
+   "tags": "etsy banner 橫幅 電商 ecommerce"
+  },
+  {
+   "id": "ebay_listing",
+   "group": "E-commerce (Global)",
+   "platform": "eBay",
+   "name_en": "Listing photo (zoom)",
+   "name_zh": "eBay 商品照",
+   "w": 1600,
+   "h": 1600,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 12288,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "The policy requires at least 500px on the longest side; 1600px is needed for zoom.",
+   "source": "https://www.ebay.com/help/policies/listing-policies/picture-policy?id=4370",
+   "confidence": "widely-cited",
+   "tags": "ebay 商品 電商 ecommerce"
+  },
+  {
+   "id": "rakuten_product",
+   "group": "E-commerce (Global)",
+   "platform": "Rakuten Ichiba",
+   "name_en": "Product image",
+   "name_zh": "樂天市場 商品圖",
+   "w": 700,
+   "h": 700,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 2048,
+   "formats": [
+    "jpg",
+    "gif"
+   ],
+   "note_en": "Smartphones display it at 700px. On the first image, text may cover at most 20%.",
+   "source": "https://airphoto.jp/blog/ec-055",
+   "confidence": "widely-cited",
+   "tags": "rakuten 樂天 楽天 電商 ecommerce"
+  },
+  {
+   "id": "gads_landscape",
+   "group": "Google Ads",
+   "platform": "Google Ads (PMax / Display)",
+   "name_en": "Landscape image",
+   "name_zh": "Google 廣告 橫式",
+   "w": 1200,
+   "h": 628,
+   "ratio": "1.91:1",
+   "safe": [
+    120,
+    63,
+    120,
+    63
+   ],
+   "max_kb": 5120,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Minimum 600x314. Keep important content in the middle 80%.",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "tags": "google ads pmax 廣告 橫式"
+  },
+  {
+   "id": "gads_square",
+   "group": "Google Ads",
+   "platform": "Google Ads (PMax / Display)",
+   "name_en": "Square image",
+   "name_zh": "Google 廣告 方形",
+   "w": 1200,
+   "h": 1200,
+   "ratio": "1:1",
+   "safe": [
+    120,
+    120,
+    120,
+    120
+   ],
+   "max_kb": 5120,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Minimum 300x300.",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "tags": "google ads pmax 廣告 方形"
+  },
+  {
+   "id": "gads_portrait",
+   "group": "Google Ads",
+   "platform": "Google Ads (PMax / Display)",
+   "name_en": "Portrait image 4:5",
+   "name_zh": "Google 廣告 直式",
+   "w": 960,
+   "h": 1200,
+   "ratio": "4:5",
+   "safe": [
+    96,
+    120,
+    96,
+    120
+   ],
+   "max_kb": 5120,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Minimum 480x600.",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "tags": "google ads pmax 廣告 直式"
+  },
+  {
+   "id": "gads_logo_square",
+   "group": "Google Ads",
+   "platform": "Google Ads (PMax / Display)",
+   "name_en": "Logo square",
+   "name_zh": "Google 廣告 Logo 方形",
+   "w": 1200,
+   "h": 1200,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 5120,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Minimum 128x128.",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "tags": "google ads logo"
+  },
+  {
+   "id": "gads_logo_landscape",
+   "group": "Google Ads",
+   "platform": "Google Ads (PMax / Display)",
+   "name_en": "Logo landscape 4:1",
+   "name_zh": "Google 廣告 Logo 橫式",
+   "w": 1200,
+   "h": 300,
+   "ratio": "4:1",
+   "safe": null,
+   "max_kb": 5120,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Minimum 512x128.",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "tags": "google ads logo"
+  },
+  {
+   "id": "display_300x250",
+   "group": "Google Ads",
+   "platform": "Google Display (upload)",
+   "name_en": "Medium rectangle",
+   "name_zh": "多媒體廣告 300×250",
+   "w": 300,
+   "h": 250,
+   "ratio": "6:5",
+   "safe": null,
+   "max_kb": 150,
+   "formats": [
+    "gif",
+    "jpg",
+    "png"
+   ],
+   "note_en": "Uploaded image ads are limited to 150KB. Animated GIFs must be under 5 FPS and 30 seconds total.",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "tags": "google display 多媒體 gif banner"
+  },
+  {
+   "id": "display_336x280",
+   "group": "Google Ads",
+   "platform": "Google Display (upload)",
+   "name_en": "Large rectangle",
+   "name_zh": "多媒體廣告 336×280",
+   "w": 336,
+   "h": 280,
+   "ratio": "6:5",
+   "safe": null,
+   "max_kb": 150,
+   "formats": [
+    "gif",
+    "jpg",
+    "png"
+   ],
+   "note_en": "150KB limit.",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "tags": "google display 多媒體 gif banner"
+  },
+  {
+   "id": "display_300x600",
+   "group": "Google Ads",
+   "platform": "Google Display (upload)",
+   "name_en": "Half page",
+   "name_zh": "多媒體廣告 300×600",
+   "w": 300,
+   "h": 600,
+   "ratio": "1:2",
+   "safe": null,
+   "max_kb": 150,
+   "formats": [
+    "gif",
+    "jpg",
+    "png"
+   ],
+   "note_en": "150KB limit.",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "tags": "google display 多媒體 gif banner"
+  },
+  {
+   "id": "display_728x90",
+   "group": "Google Ads",
+   "platform": "Google Display (upload)",
+   "name_en": "Leaderboard",
+   "name_zh": "多媒體廣告 728×90",
+   "w": 728,
+   "h": 90,
+   "ratio": "8.1:1",
+   "safe": null,
+   "max_kb": 150,
+   "formats": [
+    "gif",
+    "jpg",
+    "png"
+   ],
+   "note_en": "150KB limit.",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "tags": "google display 多媒體 gif banner"
+  },
+  {
+   "id": "display_320x100",
+   "group": "Google Ads",
+   "platform": "Google Display (upload)",
+   "name_en": "Large mobile banner",
+   "name_zh": "多媒體廣告 320×100",
+   "w": 320,
+   "h": 100,
+   "ratio": "16:5",
+   "safe": null,
+   "max_kb": 150,
+   "formats": [
+    "gif",
+    "jpg",
+    "png"
+   ],
+   "note_en": "150KB limit.",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "tags": "google display 多媒體 gif banner mobile"
+  },
+  {
+   "id": "line_rich_message_tall",
+   "group": "LINE",
+   "platform": "LINE Official Account",
+   "name_en": "Rich message (imagemap), tall 1040×1300",
+   "name_zh": "LINE 圖文訊息 直式",
+   "w": 1040,
+   "h": 1300,
+   "ratio": "4:5",
+   "safe": null,
+   "max_kb": 10240,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Imagemap baseSize.width must be 1040; height is whatever corresponds to 1040 width. Taller images take more of the chat screen.",
+   "note_zh": "圖文訊息寬固定 1040，高依比例自訂；直式在聊天室佔更多版面",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#imagemap-message",
+   "confidence": "official",
+   "tags": "line 圖文訊息 imagemap 直式 rich message"
+  },
+  {
+   "id": "line_image_message",
+   "group": "LINE",
+   "platform": "LINE Messaging API",
+   "name_en": "Image message",
+   "name_zh": "LINE 圖片訊息",
+   "w": 1040,
+   "h": 1040,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 10240,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "JPEG/PNG over HTTPS (TLS1.2+); original ≤10MB, preview image ≤1MB. Size is free; 1040 matches the imagemap width.",
+   "note_zh": "原圖 ≤10MB、預覽圖 ≤1MB；尺寸不限，建議與圖文訊息同寬 1040",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#image-message",
+   "confidence": "official",
+   "tags": "line 圖片訊息 image message"
+  },
+  {
+   "id": "line_template_rect",
+   "group": "LINE",
+   "platform": "LINE Messaging API",
+   "name_en": "Buttons / carousel template thumbnail, rectangle 1.51:1",
+   "name_zh": "LINE 按鈕樣板／輪播縮圖 橫式",
+   "w": 1024,
+   "h": 678,
+   "ratio": "1.51:1",
+   "safe": null,
+   "max_kb": 10240,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "thumbnailImageUrl: width ≤1024px, ≤10MB; imageAspectRatio rectangle (1.51:1, default).",
+   "note_zh": "縮圖寬 ≤1024、≤10MB；rectangle＝1.51:1（預設）",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#buttons",
+   "confidence": "official",
+   "tags": "line 按鈕樣板 輪播 template carousel 縮圖"
+  },
+  {
+   "id": "line_template_square",
+   "group": "LINE",
+   "platform": "LINE Messaging API",
+   "name_en": "Template thumbnail / image carousel, square",
+   "name_zh": "LINE 樣板縮圖／圖片輪播 方形",
+   "w": 1024,
+   "h": 1024,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 10240,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "imageAspectRatio square, and image_carousel columns (always 1:1); width ≤1024px, ≤10MB.",
+   "note_zh": "樣板 square 與圖片輪播（一律 1:1）；寬 ≤1024、≤10MB",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#image-carousel",
+   "confidence": "official",
+   "tags": "line 圖片輪播 image carousel 方形"
+  },
+  {
+   "id": "line_flex_hero",
+   "group": "LINE",
+   "platform": "LINE Messaging API",
+   "name_en": "Flex Message hero image 20:13",
+   "name_zh": "LINE Flex 主圖 20:13",
+   "w": 1040,
+   "h": 676,
+   "ratio": "20:13",
+   "safe": null,
+   "max_kb": 10240,
+   "formats": [
+    "jpg",
+    "png"
+   ],
+   "note_en": "Hero image component with aspectRatio \"20:13\" and aspectMode cover (the ratio used in LINE's own examples). Must be HTTPS JPEG/PNG or it shows broken.",
+   "note_zh": "hero 圖 aspectRatio 20:13、aspectMode cover；非 HTTPS 或非 JPEG/PNG 會破圖",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#f-image",
+   "confidence": "official",
+   "tags": "line flex hero 主圖 彈性訊息"
+  },
+  {
+   "id": "shopee_product",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Product image",
+   "name_zh": "蝦皮 商品圖",
+   "w": 1000,
+   "h": 1000,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 2000,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "1:1, up to 9 images + 1 video (MP4, 10–60 s, ≤30MB, ≤1280×1280). 1000×1000 JPG verified accepted in production.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 商品 商品圖 電商 ecommerce",
+   "count": 9,
+   "video": {
+    "formats": [
+     "mp4"
+    ],
+    "max_mb": 30,
+    "seconds": [
+     10,
+     60
+    ],
+    "max_px": 1280
+   }
+  },
+  {
+   "id": "shopee_cover",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Shop cover",
+   "name_zh": "蝦皮 賣場封面",
+   "w": 450,
+   "h": 225,
+   "ratio": "2:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Article states ratio 10:3 but pixels 450×225 (=2:1) — conflicting; design at 450×225 and keep key content centered. 1 image.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 賣場 封面 cover 裝潢",
+   "count": 1
+  },
+  {
+   "id": "shopee_banner",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Shop carousel banner (basic)",
+   "name_zh": "蝦皮 輪播看板（基礎版）",
+   "w": 1200,
+   "h": 600,
+   "ratio": "2:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Up to 5 items total (images + videos). Video: MP4, 10–60 s, ≤30MB, ≤1280×1280.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 banner 輪播 看板 橫幅 賣場 裝潢",
+   "count": 5,
+   "video": {
+    "formats": [
+     "mp4"
+    ],
+    "max_mb": 30,
+    "seconds": [
+     10,
+     60
+    ],
+    "max_px": 1280
+   }
+  },
+  {
+   "id": "shopee_banner_custom_21",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Custom carousel 2:1",
+   "name_zh": "蝦皮 輪播看板（自訂比例）2:1",
+   "w": 2000,
+   "h": 1000,
+   "ratio": "2:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Custom-ratio carousel: pick one ratio (2:1 / 16:9 / 1:1) for the block. Up to 6 images; videos are YouTube links (up to 6).",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 banner 輪播 自訂 賣場 裝潢",
+   "count": 6
+  },
+  {
+   "id": "shopee_banner_custom_169",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Custom carousel 16:9",
+   "name_zh": "蝦皮 輪播看板（自訂比例）16:9",
+   "w": 2000,
+   "h": 1125,
+   "ratio": "16:9",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Up to 6 images; videos are YouTube links.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 banner 輪播 自訂 16:9 賣場 裝潢",
+   "count": 6
+  },
+  {
+   "id": "shopee_banner_custom_11",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Custom carousel 1:1",
+   "name_zh": "蝦皮 輪播看板（自訂比例）1:1",
+   "w": 2000,
+   "h": 2000,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Up to 6 images; videos are YouTube links.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 banner 輪播 自訂 方形 賣場 裝潢",
+   "count": 6
+  },
+  {
+   "id": "shopee_banner_flex",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Carousel, flexible height",
+   "name_zh": "蝦皮 輪播看板（彈性高度）",
+   "w": 1200,
+   "h": 664,
+   "ratio": "1200×100–664",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Width 1200, height 100–664 (w/h listed is the max). Up to 6 images; YouTube video links.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 banner 輪播 彈性 賣場 裝潢",
+   "count": 6
+  },
+  {
+   "id": "shopee_simple_banner",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Simple banner (pair)",
+   "name_zh": "蝦皮 簡易看板",
+   "w": 600,
+   "h": 600,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 2000,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Exactly 2 images must be uploaded.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 簡易 看板 banner 賣場 裝潢",
+   "count": 2
+  },
+  {
+   "id": "shopee_category_tile",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Image category list tile",
+   "name_zh": "蝦皮 圖片分類清單",
+   "w": 300,
+   "h": 300,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 2000,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Manual image category list.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 分類 清單 賣場 裝潢 icon"
+  },
+  {
+   "id": "shopee_simple_image",
+   "group": "E-commerce (TW)",
+   "platform": "Shopee",
+   "name_en": "Simple image (full width)",
+   "name_zh": "蝦皮 簡易圖片",
+   "w": 1200,
+   "h": 2200,
+   "ratio": "1200×100–2200",
+   "safe": null,
+   "max_kb": null,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png"
+   ],
+   "note_en": "Width 1200, height 100–2200 (w/h listed is the max). Up to 10 images.",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "tags": "shopee 蝦皮 簡易 圖片 長圖 賣場 裝潢",
+   "count": 10
+  },
+  {
+   "id": "momo_main",
+   "group": "E-commerce (TW)",
+   "platform": "momo",
+   "name_en": "Main product image",
+   "name_zh": "momo 商品主圖",
+   "w": 1000,
+   "h": 1000,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 1000,
+   "formats": [
+    "jpg"
+   ],
+   "note_en": "50–1000KB, JPG in YCbCr. 1–6 images. Product ≥80% of frame, solid background, not covered by packaging. Illustrations/accessories/text ≤20%. Watermark only lower-left or lower-right, no repeated/large coverage; shop logo may sit in empty space.",
+   "source": "https://rules.momo.com.tw/goods/00021/",
+   "confidence": "official",
+   "tags": "momo 商品 主圖 電商 ecommerce",
+   "min_kb": 50,
+   "count": 6
+  },
+  {
+   "id": "momo_ad",
+   "group": "E-commerce (TW)",
+   "platform": "momo",
+   "name_en": "Ad image (off-site ads, recommendations, category pages)",
+   "name_zh": "momo 廣告用圖",
+   "w": 1000,
+   "h": 1000,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 1000,
+   "formats": [
+    "jpg"
+   ],
+   "note_en": "50–1000KB, YCbCr. Square, no white/black borders, solid background, product ≥80%. NO overlaid labels, NO frames, NO watermark (無壓標、無壓框、無浮水印) — i.e. no logo/text.",
+   "source": "https://rules.momo.com.tw/goods/00021/",
+   "confidence": "official",
+   "tags": "momo 廣告 廣告用圖 ad 電商 ecommerce",
+   "min_kb": 50
+  },
+  {
+   "id": "momo_spec",
+   "group": "E-commerce (TW)",
+   "platform": "momo",
+   "name_en": "Variant (spec) image",
+   "name_zh": "momo 規格圖",
+   "w": 1000,
+   "h": 1000,
+   "ratio": "1:1",
+   "safe": null,
+   "max_kb": 1000,
+   "formats": [
+    "jpg"
+   ],
+   "note_en": "50–1000KB. Square, no white/black borders, solid background, product ≥80%.",
+   "source": "https://rules.momo.com.tw/goods/00021/",
+   "confidence": "official",
+   "tags": "momo 規格 變體 電商 ecommerce",
+   "min_kb": 50
+  },
+  {
+   "id": "momo_long",
+   "group": "E-commerce (TW)",
+   "platform": "momo",
+   "name_en": "Feature / description image",
+   "name_zh": "momo 商品特色（專推）圖",
+   "w": 1000,
+   "h": 1500,
+   "ratio": "1000×≤1500",
+   "safe": null,
+   "max_kb": 500,
+   "formats": [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif"
+   ],
+   "note_en": "Width 1000, height ≤1500, ≤500KB. At least 1 required, up to 20. Videos: YouTube ID only (Shorts not allowed), up to 10.",
+   "source": "https://rules.momo.com.tw/goods/00021/",
+   "confidence": "official",
+   "tags": "momo 描述 長圖 特色 專推 電商 ecommerce",
+   "count": 20
+  }
+ ]
+}

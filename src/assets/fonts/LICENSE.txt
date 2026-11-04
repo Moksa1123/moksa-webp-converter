@@ -1,0 +1,3 @@
+Space Grotesk（Florian Karsten）與 JetBrains Mono（JetBrains）皆以 SIL Open Font License 1.1 授權，
+全文見同資料夾的 OFL-SpaceGrotesk.txt、OFL-JetBrainsMono.txt。https://openfontlicense.org
+SpaceGrotesk-Bold.ttf 的內部家族名稱已從「Space Grotesk Light」改正為「Space Grotesk」（OFL 允許修改）。

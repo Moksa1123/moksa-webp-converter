@@ -1,0 +1,2 @@
+# 使用說明照原樣保存（Windows 版 CRLF、Mac 版 LF），不讓 git 轉換換行
+docs/*.txt -text

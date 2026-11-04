@@ -1,0 +1,1709 @@
+{
+ "version": "2026-10-02",
+ "categories": [
+  "電商 SKU 規範",
+  "網站 WordPress",
+  "LINE 官方帳號",
+  "Instagram",
+  "Facebook",
+  "X／Threads",
+  "YouTube／Pinterest／TikTok",
+  "Google 廣告",
+  "台灣電商平台",
+  "國際電商平台",
+  "自訂"
+ ],
+ "presets": [
+  {
+   "key": "web_product",
+   "cat": "電商 SKU 規範",
+   "label": "商品圖（首圖＋特色圖）2000×2000",
+   "naming": "product",
+   "fmt": "webp",
+   "quality": 82,
+   "limit_kb": 0,
+   "resize": [
+    "pad",
+    2000,
+    2000
+   ],
+   "hint": "第 1 張命名為 SKUpic（首圖），其餘 SKUpic1、pic2…（特色圖）。補白邊成 2000×2000，商品不會被裁掉。",
+   "method": 6
+  },
+  {
+   "key": "web_feature",
+   "cat": "電商 SKU 規範",
+   "label": "商品特色圖 2000×2000",
+   "naming": "feature",
+   "fmt": "webp",
+   "quality": 82,
+   "limit_kb": 0,
+   "resize": [
+    "pad",
+    2000,
+    2000
+   ],
+   "hint": "命名為 SKUpic1、pic2…；要接續補圖時調整「起始號」。",
+   "method": 6
+  },
+  {
+   "key": "web_sale",
+   "cat": "電商 SKU 規範",
+   "label": "銷售長圖（不限尺寸）",
+   "naming": "sale",
+   "fmt": "webp",
+   "quality": 82,
+   "limit_kb": 0,
+   "resize": [
+    "none",
+    0,
+    0
+   ],
+   "hint": "命名為 SKUsale1、sale2…；不調整尺寸（WebP 單邊上限 16383 px，超過自動縮小）。",
+   "method": 6
+  },
+  {
+   "key": "web_slider",
+   "cat": "電商 SKU 規範",
+   "label": "Slider 輪播（一次輸出 4 種尺寸）",
+   "naming": "slider",
+   "fmt": "webp",
+   "quality": 82,
+   "limit_kb": 500,
+   "multi": [
+    [
+     "slider",
+     2560,
+     1440
+    ],
+    [
+     "sliderpc",
+     1920,
+     1080
+    ],
+    [
+     "slidertablet",
+     1200,
+     675
+    ],
+    [
+     "slidermobile",
+     800,
+     450
+    ]
+   ],
+   "safe": [
+    0.1,
+    0.1,
+    0.1,
+    0.1
+   ],
+   "hint": "一張 16:9 原圖輸出 slider 2560×1440（網站上傳）、sliderpc、slidertablet、slidermobile。活動 Slider 的 SKU 欄填「年份＋活動代稱」。文字請放在虛線安全區內。",
+   "method": 6
+  },
+  {
+   "key": "wp_featured",
+   "label": "部落格特色圖 1200×675",
+   "fmt": "webp",
+   "quality": 80,
+   "limit_kb": 200,
+   "resize": [
+    "cover",
+    1200,
+    675
+   ],
+   "hint": "16:9，置中裁切。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "wp_og",
+   "label": "OG 分享圖 1200×630",
+   "fmt": "jpg",
+   "quality": 85,
+   "limit_kb": 300,
+   "resize": [
+    "cover",
+    1200,
+    630
+   ],
+   "safe": [
+    135,
+    55,
+    135,
+    55
+   ],
+   "hint": "FB、LINE 分享預覽用 JPG 較保險；部分 App 會裁成 2:1 或 1:1，重點放中間。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "wp_content",
+   "label": "文章內文圖（寬 1200）",
+   "fmt": "webp",
+   "quality": 80,
+   "limit_kb": 200,
+   "resize": [
+    "width",
+    1200,
+    0
+   ],
+   "hint": "寬 1200、高度等比；超過上限會先降品質再縮尺寸。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "wp_portfolio",
+   "label": "作品集／案例截圖 1024×640",
+   "fmt": "webp",
+   "quality": 82,
+   "limit_kb": 120,
+   "resize": [
+    "fit",
+    1024,
+    640
+   ],
+   "hint": "16:10，等比縮放不裁切。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "woo_main",
+   "label": "WooCommerce 商品主圖 1200×1200",
+   "fmt": "webp",
+   "quality": 82,
+   "limit_kb": 300,
+   "resize": [
+    "pad",
+    1200,
+    1200
+   ],
+   "hint": "1:1，補白底，商品不會被裁掉。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "woo_thumb",
+   "label": "WooCommerce 縮圖／分類圖 600×600",
+   "fmt": "webp",
+   "quality": 82,
+   "limit_kb": 80,
+   "resize": [
+    "pad",
+    600,
+    600
+   ],
+   "hint": "1:1，補白底。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "wp_banner",
+   "label": "內頁頁首橫幅 1920×600",
+   "fmt": "webp",
+   "quality": 82,
+   "limit_kb": 300,
+   "resize": [
+    "cover",
+    1920,
+    600
+   ],
+   "safe": [
+    480,
+    0,
+    480,
+    0
+   ],
+   "hint": "手機會裁掉左右兩側，文字請放在中間的虛線框內。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "wp_logo",
+   "label": "Logo（寬 600，透明 PNG）",
+   "fmt": "png",
+   "quality": 100,
+   "limit_kb": 50,
+   "resize": [
+    "width",
+    600,
+    0
+   ],
+   "hint": "保留透明背景，不裁切。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "wp_favicon",
+   "label": "Favicon 網站圖示 512×512",
+   "fmt": "png",
+   "quality": 100,
+   "limit_kb": 50,
+   "resize": [
+    "pad",
+    512,
+    512
+   ],
+   "hint": "補透明成正方形；WordPress 會自動產生小尺寸。",
+   "cat": "網站 WordPress",
+   "naming": "generic",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "email_header",
+   "cat": "網站 WordPress",
+   "label": "電子報頁首 1200×400",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1200,
+    400
+   ],
+   "safe": null,
+   "hint": "1200×400（3:1），置中裁切，業界常用",
+   "source": "https://blog.hootsuite.com/social-media-image-sizes-guide/",
+   "confidence": "widely-cited",
+   "slug": true,
+   "method": 6
+  },
+  {
+   "key": "line_carousel",
+   "label": "多頁訊息 1540×1000",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "cover",
+    1540,
+    1000
+   ],
+   "hint": "比例 1.54:1，置中裁切；10 MB 以下。",
+   "cat": "LINE 官方帳號",
+   "naming": "generic",
+   "method": 6
+  },
+  {
+   "key": "line_rich",
+   "label": "圖文訊息 1040×1040",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "cover",
+    1040,
+    1040
+   ],
+   "hint": "比例 1:1；10 MB 以下。",
+   "cat": "LINE 官方帳號",
+   "naming": "generic",
+   "method": 6
+  },
+  {
+   "key": "line_rich2x",
+   "label": "圖文訊息 高清 2080×2080",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "cover",
+    2080,
+    2080
+   ],
+   "hint": "1040×1040 的兩倍，畫面較清晰；10 MB 以下。",
+   "cat": "LINE 官方帳號",
+   "naming": "generic",
+   "method": 6
+  },
+  {
+   "key": "line_menu_l",
+   "label": "圖文選單 大（一次輸出 3 種尺寸）",
+   "fmt": "jpg",
+   "quality": 88,
+   "limit_kb": 1024,
+   "multi": [
+    [
+     "",
+     2500,
+     1686
+    ],
+    [
+     "",
+     1200,
+     810
+    ],
+    [
+     "",
+     800,
+     540
+    ]
+   ],
+   "hint": "輸出 2500×1686、1200×810、800×540，檔名後加尺寸；每張 1 MB 以下（超過自動降品質）。",
+   "cat": "LINE 官方帳號",
+   "naming": "generic",
+   "method": 6
+  },
+  {
+   "key": "line_menu_s",
+   "label": "圖文選單 小（一次輸出 3 種尺寸）",
+   "fmt": "jpg",
+   "quality": 88,
+   "limit_kb": 1024,
+   "multi": [
+    [
+     "",
+     2500,
+     843
+    ],
+    [
+     "",
+     1200,
+     405
+    ],
+    [
+     "",
+     800,
+     270
+    ]
+   ],
+   "hint": "輸出 2500×843、1200×405、800×270，檔名後加尺寸；每張 1 MB 以下（超過自動降品質）。",
+   "cat": "LINE 官方帳號",
+   "naming": "generic",
+   "method": 6
+  },
+  {
+   "key": "line_image",
+   "label": "一般圖片訊息（寬 1024）",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "width",
+    1024,
+    0
+   ],
+   "hint": "寬度 1024、長度不限；10 MB 以下。",
+   "cat": "LINE 官方帳號",
+   "naming": "generic",
+   "method": 6
+  },
+  {
+   "key": "line_rich_message_tall",
+   "cat": "LINE 官方帳號",
+   "label": "LINE 圖文訊息 直式 1040×1300",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "cover",
+    1040,
+    1300
+   ],
+   "safe": null,
+   "hint": "1040×1300（4:5），置中裁切，上限 10,240 KB，官方規格。圖文訊息寬固定 1040，高依比例自訂；直式在聊天室佔更多版面",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#imagemap-message",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "line_template_rect",
+   "cat": "LINE 官方帳號",
+   "label": "LINE 按鈕樣板／輪播縮圖 橫式 1024×678",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "cover",
+    1024,
+    678
+   ],
+   "safe": null,
+   "hint": "1024×678（1.51:1），置中裁切，上限 10,240 KB，官方規格。縮圖寬 ≤1024、≤10MB；rectangle＝1.51:1（預設）",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#buttons",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "line_template_square",
+   "cat": "LINE 官方帳號",
+   "label": "LINE 樣板縮圖／圖片輪播 方形 1024×1024",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "cover",
+    1024,
+    1024
+   ],
+   "safe": null,
+   "hint": "1024×1024（1:1），置中裁切，上限 10,240 KB，官方規格。樣板 square 與圖片輪播（一律 1:1）；寬 ≤1024、≤10MB",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#image-carousel",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "line_flex_hero",
+   "cat": "LINE 官方帳號",
+   "label": "LINE Flex 主圖 20:13 1040×676",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "cover",
+    1040,
+    676
+   ],
+   "safe": null,
+   "hint": "1040×676（20:13），置中裁切，上限 10,240 KB，官方規格。hero 圖 aspectRatio 20:13、aspectMode cover；非 HTTPS 或非 JPEG/PNG 會破圖",
+   "source": "https://developers.line.biz/en/reference/messaging-api/#f-image",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "ig_feed_square",
+   "cat": "Instagram",
+   "label": "IG 貼文 方形 1080×1080",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1080,
+    1080
+   ],
+   "safe": null,
+   "hint": "1080×1080（1:1），置中裁切，官方規格",
+   "source": "https://help.instagram.com/1631821640426723",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "ig_feed_portrait_4x5",
+   "cat": "Instagram",
+   "label": "IG 貼文 直式 4:5 1080×1350",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1080,
+    1350
+   ],
+   "safe": [
+    0,
+    45,
+    0,
+    45
+   ],
+   "hint": "1080×1350（4:5），置中裁切，官方規格",
+   "source": "https://help.instagram.com/1631821640426723",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "ig_feed_portrait_3x4",
+   "cat": "Instagram",
+   "label": "IG 貼文 直式 3:4（個人頁格狀不裁） 1080×1440",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 8000,
+   "resize": [
+    "cover",
+    1080,
+    1440
+   ],
+   "safe": null,
+   "hint": "1080×1440（3:4），置中裁切，上限 8,000 KB，官方規格",
+   "source": "https://help.instagram.com/1631821640426723",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "ig_feed_landscape",
+   "cat": "Instagram",
+   "label": "IG 貼文 橫式 1080×566",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1080,
+    566
+   ],
+   "safe": null,
+   "hint": "1080×566（1.91:1），置中裁切，官方規格",
+   "source": "https://help.instagram.com/1631821640426723",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "ig_feed_ad_4x5",
+   "cat": "Instagram",
+   "label": "IG 動態廣告 4:5 1440×1800",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 30720,
+   "resize": [
+    "cover",
+    1440,
+    1800
+   ],
+   "safe": null,
+   "hint": "1440×1800（4:5），置中裁切，上限 30,720 KB，官方規格",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/instagram-feed",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "ig_story_reel",
+   "cat": "Instagram",
+   "label": "IG 限動／Reels 9:16 1080×1920",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 8000,
+   "resize": [
+    "cover",
+    1080,
+    1920
+   ],
+   "safe": [
+    65,
+    269,
+    65,
+    672
+   ],
+   "hint": "1080×1920（9:16），置中裁切，上限 8,000 KB，業界常用",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/instagram-story",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "ig_story_measured",
+   "cat": "Instagram",
+   "label": "IG 限動 靜態圖（實測安全區） 1080×1920",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 8000,
+   "resize": [
+    "cover",
+    1080,
+    1920
+   ],
+   "safe": [
+    50,
+    250,
+    50,
+    270
+   ],
+   "hint": "1080×1920（9:16），置中裁切，上限 8,000 KB，實測",
+   "source": "",
+   "confidence": "project",
+   "method": 6
+  },
+  {
+   "key": "ig_story_ad",
+   "cat": "Instagram",
+   "label": "IG 限動廣告 9:16 1440×2560",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 30720,
+   "resize": [
+    "cover",
+    1440,
+    2560
+   ],
+   "safe": [
+    86,
+    358,
+    86,
+    896
+   ],
+   "hint": "1440×2560（9:16），置中裁切，上限 30,720 KB，官方規格",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/instagram-story",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "ig_reels_cover",
+   "cat": "Instagram",
+   "label": "IG Reels 封面 1080×1920",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1080,
+    1920
+   ],
+   "safe": [
+    0,
+    240,
+    0,
+    240
+   ],
+   "hint": "1080×1920（9:16），置中裁切，業界常用",
+   "source": "https://www.lilachbullock.com/instagram-reels-cover-size/",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "ig_profile",
+   "cat": "Instagram",
+   "label": "IG 大頭貼 320×320",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    320,
+    320
+   ],
+   "safe": null,
+   "hint": "320×320（1:1），置中裁切，業界常用",
+   "source": "https://postfa.st/sizes/instagram/profile",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "fb_feed_portrait",
+   "cat": "Facebook",
+   "label": "FB 貼文 直式 4:5 1440×1800",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 30720,
+   "resize": [
+    "cover",
+    1440,
+    1800
+   ],
+   "safe": null,
+   "hint": "1440×1800（4:5），置中裁切，上限 30,720 KB，官方規格",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/facebook-feed",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "fb_feed_square",
+   "cat": "Facebook",
+   "label": "FB 貼文 方形 1080×1080",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1080,
+    1080
+   ],
+   "safe": null,
+   "hint": "1080×1080（1:1），置中裁切，業界常用",
+   "source": "https://blog.hootsuite.com/social-media-image-sizes-guide/",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "fb_link_share",
+   "cat": "Facebook",
+   "label": "FB 連結分享圖 1200×630",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 8192,
+   "resize": [
+    "cover",
+    1200,
+    630
+   ],
+   "safe": null,
+   "hint": "1200×630（1.91:1），置中裁切，上限 8,192 KB，官方規格",
+   "source": "https://developers.facebook.com/docs/sharing/webmasters/images/",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "fb_page_cover",
+   "cat": "Facebook",
+   "label": "FB 粉專封面 851×315",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 100,
+   "resize": [
+    "cover",
+    851,
+    315
+   ],
+   "safe": null,
+   "hint": "851×315（2.7:1），置中裁切，上限 100 KB，官方規格",
+   "source": "https://www.facebook.com/help/125379114252045",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "fb_profile",
+   "cat": "Facebook",
+   "label": "FB 粉專大頭貼 320×320",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    320,
+    320
+   ],
+   "safe": null,
+   "hint": "320×320（1:1），置中裁切，官方規格",
+   "source": "https://www.facebook.com/help/125379114252045",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "fb_event_cover",
+   "cat": "Facebook",
+   "label": "FB 活動封面 1920×1005",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1920,
+    1005
+   ],
+   "safe": null,
+   "hint": "1920×1005（1.91:1），置中裁切，業界常用",
+   "source": "https://www.typeform.com/blog/facebook-event-photo-size",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "fb_group_cover",
+   "cat": "Facebook",
+   "label": "FB 社團封面 1640×856",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1640,
+    856
+   ],
+   "safe": null,
+   "hint": "1640×856（1.91:1），置中裁切，業界常用",
+   "source": "https://snappa.com/blog/facebook-group-cover-photo-size/",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "fb_story",
+   "cat": "Facebook",
+   "label": "FB 限動 9:16 1440×2560",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 30720,
+   "resize": [
+    "cover",
+    1440,
+    2560
+   ],
+   "safe": [
+    86,
+    358,
+    86,
+    896
+   ],
+   "hint": "1440×2560（9:16），置中裁切，上限 30,720 KB，官方規格",
+   "source": "https://www.facebook.com/business/ads-guide/update/image/facebook-story",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "x_card_large",
+   "cat": "X／Threads",
+   "label": "X 大圖卡片 1200×600",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 5120,
+   "resize": [
+    "cover",
+    1200,
+    600
+   ],
+   "safe": null,
+   "hint": "1200×600（2:1），置中裁切，上限 5,120 KB，業界常用",
+   "source": "https://developer.x.com/en/docs/x-for-websites/cards/overview/summary-card-with-large-image",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "x_post_16x9",
+   "cat": "X／Threads",
+   "label": "X 貼文圖 16:9 1200×675",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 5120,
+   "resize": [
+    "cover",
+    1200,
+    675
+   ],
+   "safe": null,
+   "hint": "1200×675（16:9），置中裁切，上限 5,120 KB，業界常用",
+   "source": "https://postfa.st/sizes/x/posts",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "x_header",
+   "cat": "X／Threads",
+   "label": "X 頁首橫幅 1500×500",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 5120,
+   "resize": [
+    "cover",
+    1500,
+    500
+   ],
+   "safe": [
+    0,
+    60,
+    0,
+    60
+   ],
+   "hint": "1500×500（3:1），置中裁切，上限 5,120 KB，業界常用",
+   "source": "https://help.x.com/en/managing-your-account/common-issues-when-uploading-profile-photo",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "threads_post",
+   "cat": "X／Threads",
+   "label": "Threads 貼文 4:5 1080×1350",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1080,
+    1350
+   ],
+   "safe": null,
+   "hint": "1080×1350（4:5），置中裁切，業界常用",
+   "source": "https://buffer.com/resources/social-media-image-sizes/",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "pinterest_pin",
+   "cat": "YouTube／Pinterest／TikTok",
+   "label": "Pinterest 標準 Pin 1000×1500",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 20480,
+   "resize": [
+    "cover",
+    1000,
+    1500
+   ],
+   "safe": null,
+   "hint": "1000×1500（2:3），置中裁切，上限 20,480 KB，官方規格",
+   "source": "https://help.pinterest.com/en/business/article/pinterest-product-specs",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "youtube_thumbnail",
+   "cat": "YouTube／Pinterest／TikTok",
+   "label": "YouTube 影片縮圖 1280×720",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 2048,
+   "resize": [
+    "cover",
+    1280,
+    720
+   ],
+   "safe": [
+    0,
+    0,
+    200,
+    100
+   ],
+   "hint": "1280×720（16:9），置中裁切，上限 2,048 KB，業界常用",
+   "source": "https://support.google.com/youtube/answer/72431",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "youtube_banner",
+   "cat": "YouTube／Pinterest／TikTok",
+   "label": "YouTube 頻道橫幅 2560×1440",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 6144,
+   "resize": [
+    "cover",
+    2560,
+    1440
+   ],
+   "safe": [
+    507,
+    508,
+    507,
+    509
+   ],
+   "hint": "2560×1440（16:9），置中裁切，上限 6,144 KB，官方規格",
+   "source": "https://support.google.com/youtube/answer/12950272",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "tiktok_video",
+   "cat": "YouTube／Pinterest／TikTok",
+   "label": "TikTok 影片／封面 1080×1920",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1080,
+    1920
+   ],
+   "safe": [
+    60,
+    130,
+    140,
+    484
+   ],
+   "hint": "1080×1920（9:16），置中裁切，業界常用",
+   "source": "https://ads.tiktok.com/help/article/tiktok-auction-in-feed-ads",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "gads_landscape",
+   "cat": "Google 廣告",
+   "label": "Google 廣告 橫式 1200×628",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 5120,
+   "resize": [
+    "cover",
+    1200,
+    628
+   ],
+   "safe": [
+    120,
+    63,
+    120,
+    63
+   ],
+   "hint": "1200×628（1.91:1），置中裁切，上限 5,120 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "gads_square",
+   "cat": "Google 廣告",
+   "label": "Google 廣告 方形 1200×1200",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 5120,
+   "resize": [
+    "cover",
+    1200,
+    1200
+   ],
+   "safe": [
+    120,
+    120,
+    120,
+    120
+   ],
+   "hint": "1200×1200（1:1），置中裁切，上限 5,120 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "gads_portrait",
+   "cat": "Google 廣告",
+   "label": "Google 廣告 直式 960×1200",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 5120,
+   "resize": [
+    "cover",
+    960,
+    1200
+   ],
+   "safe": [
+    96,
+    120,
+    96,
+    120
+   ],
+   "hint": "960×1200（4:5），置中裁切，上限 5,120 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "gads_logo_square",
+   "cat": "Google 廣告",
+   "label": "Google 廣告 Logo 方形 1200×1200",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 5120,
+   "resize": [
+    "cover",
+    1200,
+    1200
+   ],
+   "safe": null,
+   "hint": "1200×1200（1:1），置中裁切，上限 5,120 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "gads_logo_landscape",
+   "cat": "Google 廣告",
+   "label": "Google 廣告 Logo 橫式 1200×300",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 5120,
+   "resize": [
+    "cover",
+    1200,
+    300
+   ],
+   "safe": null,
+   "hint": "1200×300（4:1），置中裁切，上限 5,120 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/17091269",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "display_300x250",
+   "cat": "Google 廣告",
+   "label": "多媒體廣告 300×250",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 150,
+   "resize": [
+    "cover",
+    300,
+    250
+   ],
+   "safe": null,
+   "hint": "300×250（6:5），置中裁切，上限 150 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "display_336x280",
+   "cat": "Google 廣告",
+   "label": "多媒體廣告 336×280",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 150,
+   "resize": [
+    "cover",
+    336,
+    280
+   ],
+   "safe": null,
+   "hint": "336×280（6:5），置中裁切，上限 150 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "display_300x600",
+   "cat": "Google 廣告",
+   "label": "多媒體廣告 300×600",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 150,
+   "resize": [
+    "cover",
+    300,
+    600
+   ],
+   "safe": null,
+   "hint": "300×600（1:2），置中裁切，上限 150 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "display_728x90",
+   "cat": "Google 廣告",
+   "label": "多媒體廣告 728×90",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 150,
+   "resize": [
+    "cover",
+    728,
+    90
+   ],
+   "safe": null,
+   "hint": "728×90（8.1:1），置中裁切，上限 150 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "display_320x100",
+   "cat": "Google 廣告",
+   "label": "多媒體廣告 320×100",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 150,
+   "resize": [
+    "cover",
+    320,
+    100
+   ],
+   "safe": null,
+   "hint": "320×100（16:5），置中裁切，上限 150 KB，官方規格",
+   "source": "https://support.google.com/google-ads/answer/1722096",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "woo_desc",
+   "cat": "台灣電商平台",
+   "label": "Woo 商品描述圖 1000×1000",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 400,
+   "resize": [
+    "cover",
+    1000,
+    1000
+   ],
+   "safe": null,
+   "hint": "1000×1000（1:1），置中裁切，上限 400 KB，實測",
+   "source": "",
+   "confidence": "project",
+   "method": 6
+  },
+  {
+   "key": "shopee_product",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 商品圖 1000×1000",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 2000,
+   "resize": [
+    "pad",
+    1000,
+    1000
+   ],
+   "safe": null,
+   "hint": "1000×1000（1:1），補白邊不裁切，上限 2,000 KB，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_cover",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 賣場封面 450×225",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    450,
+    225
+   ],
+   "safe": null,
+   "hint": "450×225（2:1），置中裁切，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_banner",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 輪播看板（基礎版） 1200×600",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1200,
+    600
+   ],
+   "safe": null,
+   "hint": "1200×600（2:1），置中裁切，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_banner_custom_21",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 輪播看板（自訂比例）2:1 2000×1000",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    2000,
+    1000
+   ],
+   "safe": null,
+   "hint": "2000×1000（2:1），置中裁切，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_banner_custom_169",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 輪播看板（自訂比例）16:9 2000×1125",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    2000,
+    1125
+   ],
+   "safe": null,
+   "hint": "2000×1125（16:9），置中裁切，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_banner_custom_11",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 輪播看板（自訂比例）1:1 2000×2000",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    2000,
+    2000
+   ],
+   "safe": null,
+   "hint": "2000×2000（1:1），置中裁切，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_banner_flex",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 輪播看板（彈性高度） 1200×664",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1200,
+    664
+   ],
+   "safe": null,
+   "hint": "1200×664（1200×100–664），置中裁切，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_simple_banner",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 簡易看板 600×600",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 2000,
+   "resize": [
+    "cover",
+    600,
+    600
+   ],
+   "safe": null,
+   "hint": "600×600（1:1），置中裁切，上限 2,000 KB，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_category_tile",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 圖片分類清單 300×300",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 2000,
+   "resize": [
+    "cover",
+    300,
+    300
+   ],
+   "safe": null,
+   "hint": "300×300（1:1），置中裁切，上限 2,000 KB，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "shopee_simple_image",
+   "cat": "台灣電商平台",
+   "label": "蝦皮 簡易圖片 1200×2200",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1200,
+    2200
+   ],
+   "safe": null,
+   "hint": "1200×2200（1200×100–2200），置中裁切，官方規格",
+   "source": "https://university.shopee.tw/forum/%E8%9D%A6%E5%9B%8A%E5%A6%99%E8%A8%8814%EF%BC%8D%E8%B3%A3%E5%A0%B4%E7%89%88%E4%BD%8D%E5%9C%96%E7%89%87%E6%9C%89%E5%93%AA%E4%BA%9B%E5%B0%BA%E5%AF%B8%EF%BC%9F%E5%B0%81%E9%9D%A2%E7%85%A7%E3%80%81%E5%95%86%E5%93%81%E5%9C%96%E3%80%81banner%E5%B0%BA%E5%AF%B8%E5%A4%A7%E8%A7%A3%E6%9E%90%EF%BC%81-1247",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "momo_main",
+   "cat": "台灣電商平台",
+   "label": "momo 商品主圖 1000×1000",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 1000,
+   "resize": [
+    "cover",
+    1000,
+    1000
+   ],
+   "safe": null,
+   "hint": "1000×1000（1:1），置中裁切，上限 1,000 KB，官方規格",
+   "source": "https://rules.momo.com.tw/goods/00021/",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "momo_ad",
+   "cat": "台灣電商平台",
+   "label": "momo 廣告用圖 1000×1000",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 1000,
+   "resize": [
+    "cover",
+    1000,
+    1000
+   ],
+   "safe": null,
+   "hint": "1000×1000（1:1），置中裁切，上限 1,000 KB，官方規格",
+   "source": "https://rules.momo.com.tw/goods/00021/",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "momo_spec",
+   "cat": "台灣電商平台",
+   "label": "momo 規格圖 1000×1000",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 1000,
+   "resize": [
+    "cover",
+    1000,
+    1000
+   ],
+   "safe": null,
+   "hint": "1000×1000（1:1），置中裁切，上限 1,000 KB，官方規格",
+   "source": "https://rules.momo.com.tw/goods/00021/",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "momo_long",
+   "cat": "台灣電商平台",
+   "label": "momo 商品特色（專推）圖 1000×1500",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 500,
+   "resize": [
+    "cover",
+    1000,
+    1500
+   ],
+   "safe": null,
+   "hint": "1000×1500（1000×≤1500），置中裁切，上限 500 KB，官方規格",
+   "source": "https://rules.momo.com.tw/goods/00021/",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "gmc_product",
+   "cat": "國際電商平台",
+   "label": "Google 購物商品圖 1500×1500",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 16384,
+   "resize": [
+    "pad",
+    1500,
+    1500
+   ],
+   "safe": null,
+   "hint": "1500×1500（1:1），補白邊不裁切，上限 16,384 KB，官方規格",
+   "source": "https://support.google.com/merchants/answer/6324350",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "amazon_main",
+   "cat": "國際電商平台",
+   "label": "Amazon 主圖 1600×1600",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 10240,
+   "resize": [
+    "pad",
+    1600,
+    1600
+   ],
+   "safe": null,
+   "hint": "1600×1600（1:1），補白邊不裁切，上限 10,240 KB，業界常用",
+   "source": "https://www.junglescout.com/resources/articles/amazon-image-requirements/",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "amazon_aplus_header",
+   "cat": "國際電商平台",
+   "label": "Amazon A+ 滿版 970×600",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 2048,
+   "resize": [
+    "cover",
+    970,
+    600
+   ],
+   "safe": null,
+   "hint": "970×600（97:60），置中裁切，上限 2,048 KB，業界常用",
+   "source": "https://www.growthjockey.com/blogs/guide-to-amazon-a-plus-content-examples-and-image-dimension-guidelines",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "amazon_aplus_premium",
+   "cat": "國際電商平台",
+   "label": "Amazon Premium A+ 1464×600",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 2048,
+   "resize": [
+    "cover",
+    1464,
+    600
+   ],
+   "safe": null,
+   "hint": "1464×600（2.44:1），置中裁切，上限 2,048 KB，業界常用",
+   "source": "https://www.growthjockey.com/blogs/guide-to-amazon-a-plus-content-examples-and-image-dimension-guidelines",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "shopify_product",
+   "cat": "國際電商平台",
+   "label": "Shopify 商品圖 2048×2048",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 20480,
+   "resize": [
+    "pad",
+    2048,
+    2048
+   ],
+   "safe": null,
+   "hint": "2048×2048（1:1），補白邊不裁切，上限 20,480 KB，官方規格",
+   "source": "https://help.shopify.com/en/manual/products/product-media/product-media-types",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "etsy_listing",
+   "cat": "國際電商平台",
+   "label": "Etsy 商品照 2000×2000",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 1024,
+   "resize": [
+    "cover",
+    2000,
+    2000
+   ],
+   "safe": null,
+   "hint": "2000×2000（1:1），置中裁切，上限 1,024 KB，官方規格",
+   "source": "https://help.etsy.com/hc/en-us/articles/115015663347",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "etsy_banner",
+   "cat": "國際電商平台",
+   "label": "Etsy 店舖大橫幅 1600×400",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 0,
+   "resize": [
+    "cover",
+    1600,
+    400
+   ],
+   "safe": null,
+   "hint": "1600×400（4:1），置中裁切，官方規格",
+   "source": "https://help.etsy.com/hc/en-us/articles/115015663347",
+   "confidence": "official",
+   "method": 6
+  },
+  {
+   "key": "ebay_listing",
+   "cat": "國際電商平台",
+   "label": "eBay 商品照 1600×1600",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 12288,
+   "resize": [
+    "cover",
+    1600,
+    1600
+   ],
+   "safe": null,
+   "hint": "1600×1600（1:1），置中裁切，上限 12,288 KB，業界常用",
+   "source": "https://www.ebay.com/help/policies/listing-policies/picture-policy?id=4370",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "rakuten_product",
+   "cat": "國際電商平台",
+   "label": "樂天市場 商品圖 700×700",
+   "naming": "generic",
+   "fmt": "jpg",
+   "quality": 90,
+   "limit_kb": 2048,
+   "resize": [
+    "pad",
+    700,
+    700
+   ],
+   "safe": null,
+   "hint": "700×700（1:1），補白邊不裁切，上限 2,048 KB，業界常用",
+   "source": "https://airphoto.jp/blog/ec-055",
+   "confidence": "widely-cited",
+   "method": 6
+  },
+  {
+   "key": "custom_keep",
+   "cat": "自訂",
+   "label": "保留原檔名",
+   "naming": "keep",
+   "apply": false,
+   "hint": "下方格式、品質、尺寸全部自己設定。",
+   "method": 6
+  },
+  {
+   "key": "custom_serial",
+   "cat": "自訂",
+   "label": "名稱＋流水號",
+   "naming": "serial",
+   "apply": false,
+   "hint": "檔名＝名稱＋符號＋號碼，例如 banner-01、banner-02。",
+   "method": 6
+  }
+ ]
+}

@@ -1,0 +1,173 @@
+# 打包 Windows 與 macOS 版本
+# - 推送 v* 標籤（例如 v1.3.0）：打包、自我測試、建立 GitHub Release 並附上安裝檔
+# - 手動執行（Actions → build → Run workflow）：只打包與測試，檔案在該次執行的 Artifacts
+name: build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYINSTALLER_VERSION: "6.22.3"
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: 安裝套件
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller==${{ env.PYINSTALLER_VERSION }}
+      - name: 讀取版本
+        id: ver
+        shell: bash
+        run: echo "v=$(grep -oP 'APP_VERSION = "\K[^"]+' src/moksa_image_converter.py)" >> "$GITHUB_OUTPUT"
+      - name: 打包 exe
+        run: >
+          pyinstaller --noconfirm --onefile --windowed
+          --name MoksaWebImageConverter
+          --icon packaging/icon.ico
+          --version-file packaging/version_info.txt
+          --add-data "src/assets;assets"
+          --collect-all tkinterdnd2
+          --exclude-module numpy
+          src/moksa_image_converter.py
+      - name: 自我測試（實際轉檔）
+        shell: pwsh
+        run: |
+          $p = Start-Process dist/MoksaWebImageConverter.exe -ArgumentList '--selftest', "$PWD/selftest-out" -Wait -PassThru
+          Get-Content selftest-out/selftest.txt -Encoding utf8
+          if ($p.ExitCode -ne 0) { throw "自我測試失敗（結束碼 $($p.ExitCode)）" }
+      - name: 調整主機螢幕解析度為 1920×1080（預設 1024×768）
+        continue-on-error: true
+        shell: pwsh
+        run: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+      - name: 介面測試（開視窗、檢查拖放與字型、截圖；含 1366×768、1024×768 小螢幕）
+        shell: pwsh
+        run: |
+          $fail = 0
+          foreach ($scr in @('', '1366x768', '1024x768')) {
+            $a = @('--uitest', "$PWD/uitest-out")
+            if ($scr) { $a += @('--screen', $scr) }
+            $p = Start-Process dist/MoksaWebImageConverter.exe -ArgumentList $a -Wait -PassThru
+            if ($p.ExitCode -ne 0) { $fail = 1 }
+          }
+          Get-ChildItem uitest-out/uitest*.txt | ForEach-Object { Get-Content $_ -Encoding utf8; '' }
+          if ($fail) { throw "介面測試失敗" }
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: uitest-windows
+          path: |
+            uitest-out/*.png
+            uitest-out/uitest*.txt
+      - name: 壓縮成 zip（內含中文檔名 exe 與使用說明）
+        shell: bash
+        run: |
+          mkdir -p pkg
+          cp dist/MoksaWebImageConverter.exe "pkg/MoksaWeb-WebP轉換工具.exe"
+          cp docs/使用說明_Windows.txt "pkg/MoksaWeb-WebP轉換工具_使用說明.txt"
+          python - <<'EOF'
+          import zipfile, pathlib, os
+          v = os.environ["VER"]
+          z = zipfile.ZipFile(f"MoksaWeb-ImageConverter-{v}-windows.zip", "w", zipfile.ZIP_DEFLATED)
+          for f in pathlib.Path("pkg").iterdir():
+              z.write(f, f.name)
+          z.close()
+          EOF
+        env:
+          VER: ${{ steps.ver.outputs.v }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows
+          path: MoksaWeb-ImageConverter-*-windows.zip
+
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14          # Apple 晶片（M1 以後）
+            arch: arm64
+            optional: false
+          - runner: macos-15-intel    # Intel Mac；GitHub 若停用此主機，這項失敗不影響發版
+            arch: x86_64
+            optional: true
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.optional }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: 安裝套件
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller==${{ env.PYINSTALLER_VERSION }}
+      - name: 讀取版本
+        id: ver
+        run: echo "v=$(sed -n 's/^APP_VERSION = "\(.*\)"/\1/p' src/moksa_image_converter.py)" >> "$GITHUB_OUTPUT"
+      - name: 打包 .app
+        run: >
+          pyinstaller --noconfirm --windowed
+          --name "Moksa Web Image Converter"
+          --osx-bundle-identifier com.moksaweb.imageconverter
+          --icon packaging/icon.icns
+          --add-data "src/assets:assets"
+          --collect-all tkinterdnd2
+          --exclude-module numpy
+          src/moksa_image_converter.py
+      - name: 自我測試（實際轉檔）
+        run: |
+          "dist/Moksa Web Image Converter.app/Contents/MacOS/Moksa Web Image Converter" --selftest "$PWD/selftest-out"
+          cat selftest-out/selftest.txt
+      - name: 介面測試（開視窗、檢查拖放與字型、截圖；含 1366×768）
+        run: |
+          APP="dist/Moksa Web Image Converter.app/Contents/MacOS/Moksa Web Image Converter"
+          rc=0
+          "$APP" --uitest "$PWD/uitest-out" || rc=1
+          "$APP" --uitest "$PWD/uitest-out" --screen 1366x768 || rc=1
+          for f in uitest-out/uitest*.txt; do cat "$f"; echo; done
+          exit $rc
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: uitest-mac-${{ matrix.arch }}
+          path: |
+            uitest-out/*.png
+            uitest-out/uitest*.txt
+      - name: 製作 dmg
+        run: |
+          mkdir -p dmg
+          cp -R "dist/Moksa Web Image Converter.app" dmg/
+          ln -s /Applications dmg/Applications
+          cp docs/使用說明_Mac.txt "dmg/使用說明.txt"
+          hdiutil create -volname "Moksa Web Image Converter" -srcfolder dmg -ov -format UDZO \
+            "MoksaWeb-ImageConverter-${{ steps.ver.outputs.v }}-mac-${{ matrix.arch }}.dmg"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: mac-${{ matrix.arch }}
+          path: MoksaWeb-ImageConverter-*-mac-*.dmg
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: out
+          pattern: "{windows,mac-*}"
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v3
+        with:
+          files: out/*
+          generate_release_notes: true

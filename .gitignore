@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+build/
+dist/
+pkg/
+dmg/
+*.spec
+selftest-out/
+*.zip
+*.dmg
+
+# 本機工作檔（不進 repo）
+CLAUDE.md
+狀態.md
+memory/
+uitest-screens/
+releases/
+proposals/
+scripts/brand_words.local.txt
+publish/
+uitest-out/
