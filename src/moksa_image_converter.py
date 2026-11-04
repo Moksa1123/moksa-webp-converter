@@ -53,7 +53,7 @@ IS_MAC = sys.platform == "darwin"
 
 APP_NAME = "Moksa Web"
 APP_TITLE = "Moksa Web WebP 圖片轉換工具"
-APP_VERSION = "1.4.0"
+APP_VERSION = "1.4.1"
 APP_URL = "https://moksaweb.com/"
 APP_ABOUT = ("台中的網站工程工作室。WordPress、WooCommerce、LINE 整合、n8n 與 AI 自動化、客製 ERP——"
              "從規劃、開發到上線維運，一個窗口負責到底。")
@@ -883,7 +883,8 @@ class App(RootBase):
         body.rowconfigure(0, weight=1)
 
         # ===== 右側設定 =====
-        self.right_w = int(400 * k) if self._W >= int(1200 * k) else int(370 * k)
+        extra = 30 if IS_MAC else 0  # 蘋方字比較寬，Mac 右側欄加寬，「用途」名稱才放得下
+        self.right_w = int((400 + extra) * k) if self._W >= int(1200 * k) else int((370 + extra) * k)
         right = ttk.Frame(body, width=self.right_w)
         right.grid(row=0, column=1, sticky="ns", padx=(int(16 * k), 0))
         right.grid_propagate(False)
@@ -1010,7 +1011,8 @@ class App(RootBase):
                           ("out", "輸出檔名", "w"), ("status", "狀態", "w")):
             self.tree.heading(c, text=t, anchor=anc)
             self.tree.column(c, anchor=anc, stretch=c in ("name", "out"))
-        self.tree.column("#0", width=int(58 * k), stretch=False, anchor="center")
+        self.thumb_col = int((86 if IS_MAC else 64) * k)  # Mac 的清單在圖片前多縮排約 20px
+        self.tree.column("#0", width=self.thumb_col, stretch=False, anchor="center")
         self.tree.tag_configure("warn", foreground="#A15C07")
         self.tree.tag_configure("err", foreground=DANGER)
         self.tree.tag_configure("run", foreground=ACCENT)
@@ -1146,7 +1148,7 @@ class App(RootBase):
     def _fit_columns(self, width):
         """清單欄寬跟著視窗：固定欄不動，剩下的寬度 4:6 分給原始檔名與輸出檔名"""
         k = self.k
-        fixed = {"#0": int(58 * k), "dim": int(96 * k), "size": int(76 * k), "status": int(104 * k)}
+        fixed = {"#0": self.thumb_col, "dim": int(96 * k), "size": int(76 * k), "status": int(104 * k)}
         rest = max(int(200 * k), width - sum(fixed.values()) - 4)
         widths = dict(fixed, name=int(rest * 0.42), out=rest - int(rest * 0.42))
         for c, w in widths.items():
@@ -1534,8 +1536,9 @@ class App(RootBase):
                     im.draft("RGB", (s * 4, s * 4))
                     im = ImageOps.exif_transpose(im).convert("RGBA")
                     t = ImageOps.fit(im, (s, s), Image.LANCZOS)
-                out = Image.new("RGBA", (s, s), (0, 0, 0, 0))
-                out.paste(t, (0, 0), mask)
+                gap = int(8 * self.k)  # 左右留白：Mac 的清單圖片靠左對齊，不留白會貼著檔名
+                out = Image.new("RGBA", (s + 2 * gap, s), (0, 0, 0, 0))
+                out.paste(t, (gap, 0), mask)
                 self.q.put(("thumb", p, out))
             except Exception:
                 pass
@@ -2202,6 +2205,16 @@ def uitest(out_dir: str, screen: str = "") -> int:
         check("加入資料夾", len(app.files) == 4, f"{len(app.files)} 張")
         check("加圖後：顯示清單與預覽", app.view_list.winfo_ismapped() and not app.view_empty.winfo_ismapped())
         check("清單縮圖", len(app.thumbs) == 4, f"{len(app.thumbs)} 張")
+        th = next(iter(app.thumbs.values()))
+        check("縮圖與檔名有間距", app.tree.column("#0", "width") >= th.width() and th.width() > th.height(),
+              f"縮圖欄 {app.tree.column('#0', 'width')}，縮圖 {th.width()}×{th.height()}")
+        f_ = tkfont.Font(root=app, font=app.cb_preset.cget("font") or ttk.Style(app).lookup("TCombobox", "font")
+                         or "TkTextFont")
+        need, have = f_.measure(app.v_preset.get()) + int(36 * app.k), app.cb_preset.winfo_width()
+        if app._W >= int(1200 * app.k) or need <= have:
+            check("「用途」名稱完整顯示", need <= have, f"文字需要 {need}，欄位 {have}")
+        else:  # 1024 寬這種極窄視窗，右側欄較窄，長名稱可能被切（下方說明文字仍完整）
+            lines.append(f"注意 「用途」名稱在極窄視窗可能被切：文字需要 {need}，欄位 {have}")
         cut = [str(b.cget("text") or b.cget("image")) for b in app.bar_items if not visible(b)]
         check("工具列按鈕都看得到", not cut, "被擠掉：" + "、".join(cut) if cut else f"{len(app.bar_items)} 個")
         chips = [c.text for c in app.chips if c.winfo_ismapped()]
