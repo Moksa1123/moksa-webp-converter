@@ -55,7 +55,7 @@ IS_MAC = sys.platform == "darwin"
 
 APP_NAME = "Moksa Web"
 APP_TITLE = "Moksa Web WebP 圖片轉換工具"
-APP_VERSION = "1.6.0"
+APP_VERSION = "1.6.1"
 APP_URL = "https://moksaweb.com/"
 APP_ABOUT = ("台中的網站工程工作室。WordPress、WooCommerce、LINE 整合、n8n 與 AI 自動化、客製 ERP——"
              "從規劃、開發到上線維運，一個窗口負責到底。")
@@ -372,10 +372,12 @@ def render(frames, durations, loop, extras, rs, opt):
         out = [flatten(out[0])]
     can_lower = fmt == "jpg" or (fmt == "webp" and opt["mode"] != "lossless")
 
-    def enc(imgs, q):
+    method = int(opt["method"])
+
+    def enc(imgs, q, meth=None):
         buf = io.BytesIO()
         if fmt == "webp":
-            p = dict(lossless=opt["mode"] == "lossless", quality=q, method=int(opt["method"]),
+            p = dict(lossless=opt["mode"] == "lossless", quality=q, method=method if meth is None else meth,
                      alpha_quality=int(opt["alpha_quality"]), **extras)
             if len(imgs) > 1:
                 imgs[0].save(buf, "WEBP", save_all=True, append_images=imgs[1:],
@@ -390,27 +392,71 @@ def render(frames, durations, loop, extras, rs, opt):
                          **({"icc_profile": extras["icc_profile"]} if "icc_profile" in extras else {}))
         return buf.getvalue()
 
-    q = int(opt["quality"])
+    q0 = int(opt["quality"])
     limit = int(opt["limit_kb"]) * 1024
-    data = enc(out, q)
-    scale = 1.0
-    if limit and len(data) > limit:
-        # 1) 先降品質到 60
-        while can_lower and len(data) > limit and q > 60:
-            q = max(60, q - 5)
-            data = enc(out, q)
-        # 2) 尺寸不固定的用途：每次縮 10%，最多縮到一半
+    data = enc(out, q0)
+    q, scale = q0, 1.0
+    if limit and len(data) > limit and (can_lower or rs.get("resize_mode", "none") in
+                                        ("none", "width", "height", "fit", "percent")):
+        # 超過檔案上限時依序嘗試的（品質, 縮放）：
+        # 1) 先降品質到 60（每次 5）  2) 尺寸不固定的用途：每次縮 10%，最多縮到約一半  3) 再降品質到 40
+        seq = [(q0, 1.0)]
+        qq, ss = q0, 1.0
+        while can_lower and qq > 60:
+            qq = max(60, qq - 5)
+            seq.append((qq, ss))
         if rs.get("resize_mode", "none") in ("none", "width", "height", "fit", "percent"):
-            base_imgs = out
-            while len(data) > limit and scale > 0.55:
-                scale *= 0.9
-                out = [im.resize((max(1, round(im.width * scale)), max(1, round(im.height * scale))),
-                                 Image.LANCZOS) for im in base_imgs]
-                data = enc(out, q)
-        # 3) 還是超過就繼續降品質到 40
-        while can_lower and len(data) > limit and q > 40:
-            q = max(40, q - 5)
-            data = enc(out, q)
+            while ss > 0.55:
+                ss *= 0.9
+                seq.append((qq, ss))
+        while can_lower and qq > 40:
+            qq = max(40, qq - 5)
+            seq.append((qq, ss))
+
+        base_imgs = out
+        scaled = {1.0: out}
+
+        def imgs_at(s):
+            if s not in scaled:
+                scaled[s] = [im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))),
+                                       Image.LANCZOS) for im in base_imgs]
+            return scaled[s]
+
+        def try_at(i, meth=None):
+            qi, si = seq[i]
+            return enc(imgs_at(si), qi, meth)
+
+        # 以前是一格一格試（最多十幾次完整壓縮）。現在用「對半找」找出第一個符合上限的組合：
+        # WebP 先用比較快的壓縮設定（method 4）找，找到後用原本的設定確認，並往前一格檢查有沒有更好的，
+        # 所以結果跟一格一格試相同，只是快很多
+        fast = method > 4 and fmt == "webp" and opt["mode"] != "lossless"
+        last = len(seq) - 1  # seq[0] 已經確定超過
+        i, data = 1, try_at(1)  # 常見情況：降一格就符合
+        if len(data) > limit and last > 1:
+            data = None
+            if len(try_at(last, 4 if fast else None)) > limit:  # 最後一格（最小）也壓不進去 → 直接用最後一格
+                i = last
+            else:
+                lo, hi, found = 2, last - 1, last
+                while lo <= hi:
+                    mid = (lo + hi) // 2
+                    if len(try_at(mid, 4 if fast else None)) <= limit:
+                        found, hi = mid, mid - 1
+                    else:
+                        lo = mid + 1
+                i = found
+            data = try_at(i)
+        if fast and i > 1:
+            while len(data) > limit and i < len(seq) - 1:  # 少見：原設定反而比較大 → 往後找
+                i += 1
+                data = try_at(i)
+            while i > 2 and len(data) <= limit:  # 原設定通常比較小 → 往前一格看看是否也符合（seq[1] 已用原設定試過）
+                d2 = try_at(i - 1)
+                if len(d2) > limit:
+                    break
+                i, data = i - 1, d2
+        q, scale = seq[i]
+        out = imgs_at(scale)
     out[0].info["shrink"] = scale
     return data, (q if can_lower else None), out[0], up
 
@@ -893,6 +939,10 @@ class App(RootBase):
         self.busy = False
         self._pv_token = 0
         self._pv_job = None
+        self._pv_running = False   # 同時只跑一個預覽
+        self._pv_pending = False   # 跑的期間設定又改了 → 跑完再算一次
+        self._pv_cache = None      # 上一次的預覽結果（設定只改檔名時直接沿用）
+        self._src_cache = None     # 上一次讀的原圖
         self._pv_imgs = [None, None]
         self._pv_last = None
         self._pv_ratio = None                   # 預覽算出的「輸出／原檔」比例，用來預估總大小
@@ -1963,23 +2013,49 @@ class App(RootBase):
         opt = self._collect(save=False)
         self._pv_token += 1
         tok = self._pv_token
-        self.lbl_info_r.configure(text="產生預覽中…")
+        if self._pv_running:
+            # 上一個預覽還在算：不要再多開一個搶 CPU，等它算完再算最新的設定
+            self._pv_pending = True
+            self.lbl_info_r.configure(text="產生預覽中…")
+            return
+        self._pv_running = True
         threading.Thread(target=self._preview_worker, args=(tok, src, idx, len(self.files), opt), daemon=True).start()
+        # 很快就算好（例如只改了 SKU）時不閃「產生預覽中…」
+        self.after(250, lambda t=tok: self._pv_token == t and self._pv_running and
+                   self.lbl_info_r.configure(text="產生預覽中…"))
+
+    # 會影響「轉出來的圖」的設定；SKU、檔名、輸出資料夾不在內（改這些只要更新檔名，不用重轉）
+    PIXEL_KEYS = ("fmt", "mode", "quality", "method", "alpha_quality", "limit_kb", "keep_exif")
 
     def _preview_worker(self, tok, src, idx, n, opt):
         try:
-            frames, durations, loop, extras = load_source(src, opt["keep_exif"])
             targets = make_targets(src, idx, n, opt)
             dst, rs, _ = targets[0]
-            data, used_q, out0, up = render(frames, durations, loop, extras, rs, opt)
-            with Image.open(io.BytesIO(data)) as im:
-                im.seek(0)
-                out = im.convert("RGBA")
-            orig = frames[0].copy()
-            old, new = src.stat().st_size, len(data)
-            w2, h2 = out.size
-            orig.thumbnail((1400, 1400))
-            out.thumbnail((1400, 1400))
+            st = src.stat()
+            key = (str(src), st.st_mtime_ns, st.st_size, json.dumps(rs, sort_keys=True),
+                   tuple(opt[k] for k in self.PIXEL_KEYS))
+            hit = self._pv_cache if self._pv_cache and self._pv_cache[0] == key else None
+            if hit:
+                _, orig, out, new, used_q, shrink, up, w2, h2 = hit
+            else:
+                skey = (str(src), st.st_mtime_ns, st.st_size, opt["keep_exif"])
+                if self._src_cache and self._src_cache[0] == skey:
+                    frames, durations, loop, extras = self._src_cache[1]
+                else:
+                    frames, durations, loop, extras = load_source(src, opt["keep_exif"])
+                    self._src_cache = (skey, (frames, durations, loop, extras))
+                data, used_q, out0, up = render(frames, durations, loop, extras, rs, opt)
+                shrink = out0.info.get("shrink", 1.0)
+                with Image.open(io.BytesIO(data)) as im:
+                    im.seek(0)
+                    out = im.convert("RGBA")
+                orig = frames[0].copy()
+                new = len(data)
+                w2, h2 = out.size
+                orig.thumbnail((1400, 1400))
+                out.thumbnail((1400, 1400))
+                self._pv_cache = (key, orig, out, new, used_q, shrink, up, w2, h2)
+            old = st.st_size
             q = "" if opt["fmt"] == "png" else (" 無損" if opt["mode"] == "lossless" and opt["fmt"] == "webp"
                                                  else f" 品質 {used_q if used_q is not None else opt['quality']}")
             meta = f"{w2}×{h2} · {opt['fmt'].upper()}{q} · {dst.name}"
@@ -1988,7 +2064,7 @@ class App(RootBase):
                 notes.append("原圖比目標尺寸小，已放大（可能變糊）")
             if used_q is not None and used_q != int(opt["quality"]):
                 notes.append(f"為符合 {opt['limit_kb']} KB，品質降到 {used_q}")
-            if out0.info.get("shrink", 1.0) < 0.999:
+            if shrink < 0.999:
                 notes.append(f"為符合 {opt['limit_kb']} KB，尺寸已縮小")
             if opt["limit_kb"] and new > opt["limit_kb"] * 1024:
                 notes.append(f"仍超過 {opt['limit_kb']} KB")
@@ -2000,6 +2076,8 @@ class App(RootBase):
             self.q.put(("preview", tok, orig, out, old, new, meta, "；".join(notes), warn, len(targets) == 1))
         except Exception as e:
             self.q.put(("preview", tok, None, None, 0, 0, f"無法預覽：{e}", "", True, False))
+        finally:
+            self.q.put(("preview_done",))
 
     def _show_preview_info(self, old, new, meta, notes, warn):
         if not old:
@@ -2284,6 +2362,11 @@ class App(RootBase):
                         self._pb_real = self._pb_cap = float(n)
                         self.lbl_prog.configure(text=f"{n} / {n} 張 · 完成")
                     self.after(600, self._finish_run, msg)
+                elif kind == "preview_done":
+                    self._pv_running = False
+                    if self._pv_pending:
+                        self._pv_pending = False
+                        self._start_preview()
                 elif kind == "preview":
                     _, tok, orig, out, old, new, meta, notes, warn, single = msg
                     if tok != self._pv_token:
@@ -2901,7 +2984,16 @@ def uitest(out_dir: str, screen: str = "") -> int:
         shot(f"2-空白狀態-拖曳中{tag}.png")
         app._drop_leave()
         app._on_drop([str(src_dir)])  # 等同把資料夾拖進視窗
-        app.after(3500, step2)
+        t0 = time.monotonic()
+
+        def wait_preview():  # 等縮圖與預覽算好（慢的測試機要比較久），最多 20 秒
+            ready = (len(app.thumbs) == 4 and "→" in app.lbl_size.cget("text")
+                     and not app._toast_job)  # 「已加入 N 張」提示收掉後，底部才會顯示預估
+            if ready or time.monotonic() - t0 > 20:
+                app.after(500, step2)
+            else:
+                app.after(200, wait_preview)
+        app.after(1500, wait_preview)
 
     def step2():  # 加了圖
         check("加入資料夾", len(app.files) == 4, f"{len(app.files)} 張")
