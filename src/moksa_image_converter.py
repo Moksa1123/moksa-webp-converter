@@ -13,6 +13,7 @@ import io
 import json
 import os
 import queue
+import re
 import subprocess
 import sys
 import threading
@@ -54,7 +55,7 @@ IS_MAC = sys.platform == "darwin"
 
 APP_NAME = "Moksa Web"
 APP_TITLE = "Moksa Web WebP 圖片轉換工具"
-APP_VERSION = "1.5.0"
+APP_VERSION = "1.6.0"
 APP_URL = "https://moksaweb.com/"
 APP_ABOUT = ("台中的網站工程工作室。WordPress、WooCommerce、LINE 整合、n8n 與 AI 自動化、客製 ERP——"
              "從規劃、開發到上線維運，一個窗口負責到底。")
@@ -91,6 +92,9 @@ UPDATE_REPO = "Moksa1123/moksa-webp-converter"
 UPDATE_API = f"https://api.github.com/repos/{UPDATE_REPO}/releases/latest"
 UPDATE_PAGE = f"https://github.com/{UPDATE_REPO}/releases/latest"
 UPDATE_AUTO = True          # 開啟時自動檢查（介面測試會關掉）
+TOUR_AUTO = True            # 第一次開啟自動顯示新手導覽（介面測試會關掉）
+MOD = "Command" if IS_MAC else "Control"   # 快捷鍵修飾鍵
+MOD_TXT = "⌘" if IS_MAC else "Ctrl＋"
 UPDATE_EVERY = 24 * 3600    # 一天最多自動檢查一次
 UI_FONT = "PingFang TC" if IS_MAC else "Microsoft JhengHei UI"
 BRAND_FONT = "Space Grotesk"
@@ -199,6 +203,7 @@ DEFAULTS = {
     "keep_exif": False, "overwrite": False, "skip_larger": False, "recursive": True, "show_safe": True,
     # 檢查更新：上次檢查時間、查到的最新版、使用者選「這版先不要」的版本
     "update_checked": 0, "update_latest": "", "update_notes": "", "update_url": "", "update_skip": "",
+    "tour_done": False,
 }
 
 
@@ -503,6 +508,30 @@ def process(src: Path, targets, opt: dict, produced: set):
         yield dst, "完成", old, new, note
 
 
+def nbsp(text: str) -> str:
+    """中英混排換行：Tk 只在半形空白斷行，中文句子會斷得參差不齊。
+    把空白換成不斷行空白，Tk 就會照寬度逐字換行。"""
+    return text.replace(" ", "\u00a0")
+
+
+def friendly_error(e: BaseException) -> str:
+    """把錯誤翻成白話"""
+    import errno
+    if isinstance(e, MemoryError):
+        return "圖片太大，記憶體不足"
+    if isinstance(e, PermissionError):
+        return "沒有權限（檔案或資料夾被鎖住、唯讀，或正被其他程式開著）"
+    if isinstance(e, OSError) and getattr(e, "errno", None) == errno.ENOSPC:
+        return "磁碟空間不足"
+    if isinstance(e, FileNotFoundError):
+        return "找不到檔案（可能被移動或刪除了）"
+    if e.__class__.__name__ in ("UnidentifiedImageError", "DecompressionBombError") or "cannot identify image" in str(e):
+        return "無法讀取這張圖（檔案可能損壞或不是圖片）"
+    if isinstance(e, OSError):
+        return "讀寫檔案失敗"
+    return "轉換失敗"
+
+
 def probe(src: Path):
     try:
         with Image.open(src) as im:
@@ -513,6 +542,76 @@ def probe(src: Path):
             return f"{w}×{h}"
     except Exception:
         return "無法讀取"
+
+
+# ======================= 說明內容 =======================
+HELP = [
+    ("快速上手", """1. 加入圖片
+把圖片或資料夾拖進視窗，或按「＋ 加入檔案」「資料夾」。一次可以放很多張。
+清單順序就是流水號順序，可以用清單上方的 ↑ ↓、排序按鈕調整，或在清單上按右鍵。
+
+2. 選用途
+右側「① 用途與檔名」先選類別（例如 Instagram、台灣電商平台、LINE 官方帳號），再選用途。
+格式、尺寸、品質、檔案上限、安全區、檔名規則都會自動帶入，右上角的「輸出摘要」會寫出結果。
+
+3. 填 SKU 或名稱
+電商用途要填 SKU（例如 ABC-001），其他用途的「名稱」可以留空（沿用原檔名）。
+
+4. 開始轉換
+按右下角「開始轉換」。清單的「狀態」欄會寫出每張省了多少；完成後按「開啟輸出資料夾」。
+「開始轉換」是灰色時，底部會寫出還缺什麼。"""),
+    ("用途與檔名", """電商 SKU 規範
+・商品圖：第 1 張是首圖 → SKUpic，其餘 → SKUpic1、SKUpic2…（2000×2000 補白邊）
+・商品特色圖：SKUpic1、pic2…；「起始號」填 3 就從 pic3 開始
+・銷售長圖：SKUsale1、sale2…；不調整尺寸
+・Slider 輪播：一張 16:9 原圖輸出 slider、sliderpc、slidertablet、slidermobile 四種尺寸
+
+LINE 官方帳號
+・LINE 只接受 JPG／PNG，所以輸出 JPG（透明背景補白）
+・圖文選單一次輸出 3 種尺寸，檔名後面加尺寸，例如 menu-2500x1686.jpg
+
+更換版本
+圖片要換新時，「更換版本」填 1 → 檔名後加 -1（例如 ABC-001pic1-1），再換一次填 2。
+
+網站 WordPress 類別
+檔名會自動轉成英文小寫、空白換成連字號，適合直接上傳網站。"""),
+    ("預覽與安全區", """點清單中的任一張圖，下方會並排顯示原圖與輸出結果，並寫出「原檔大小 → 輸出大小」和省下的比例。
+這是真的轉一次算出來的，不是估計。點預覽圖可以放大。
+
+打開「顯示安全區」，輸出圖上會畫出橘色虛線框：文字、價格、按鈕請放在框裡。
+IG 限動、YouTube 橫幅、Google 廣告等有平台規格的用途，照平台實際會被遮住的範圍畫；其他用途顯示建議的中央 80%。
+
+預覽下方出現紅字代表要注意，例如原圖太小被放大、超過檔案上限、轉完反而變大。"""),
+    ("尺寸與檔案上限", """③ 尺寸（點標題展開）
+・指定寬度／高度：等比縮放
+・限制在 寬×高 之內：等比縮到框內，不裁切
+・縮放並補白邊成 寬×高：不裁切，空白處補白
+・裁成固定 寬×高：置中裁切填滿
+・預設不放大小圖；需要時勾「允許放大小圖」（會變糊）
+
+檔案上限（在「進階設定」）
+超過上限時：先把品質每次降 5、最低 60；尺寸不固定的用途再每次縮小 10%，最多縮到一半；
+還是超過就把品質降到 40。轉換紀錄和預覽會寫出實際用的品質與尺寸。"""),
+    ("快捷鍵", f"""{MOD_TXT}O　　　　加入檔案
+{MOD_TXT}Enter　　開始轉換
+Delete　　　從清單移除選取的圖片
+F1　　　　　開啟這個說明
+清單上按右鍵：上移、下移、排序、移除、清空"""),
+    ("常見問題", """Q：為什麼轉完反而變大？
+原圖已經壓得很小時，用高品質重存會變大。品質調到 75～85，或在進階設定勾「轉完比原檔大就不保留」。
+
+Q：預覽寫「原圖較小，已放大」？
+原圖比目標尺寸小，會放大填滿，畫面可能變糊，建議換更大的原圖。
+
+Q：原始檔會被覆蓋嗎？
+不會。輸出檔名就算跟原檔一樣也不會覆蓋原檔。已經存在的輸出檔，預設也不覆蓋（進階設定可以改）。
+
+Q：轉換失敗？
+看「轉換紀錄」的原因：沒有寫入權限就換一個輸出資料夾；磁碟空間不足就清出空間；圖片損壞就重新匯出原圖。
+
+Q：怎麼更新？
+有新版本時，頁首下方會出現橘色提示，按「下載新版」。設定會自動沿用。"""),
+]
 
 
 # ======================= 介面元件（v1.4.0） =======================
@@ -623,6 +722,52 @@ class Pill(tk.Canvas):
         self.create_image(0, 0, anchor="nw", image=self._ph)
         self.create_text(w // 2, h // 2, text=self.text, fill=self.fg, font=self._font)
         self.configure(width=w, height=h)
+
+
+class Bar(tk.Canvas):
+    """品牌色進度條（主題內建的進度條只有 2px，轉換中看不太出來）。用法和 ttk.Progressbar 一樣：configure(maximum=, value=)、bar["value"]"""
+
+    def __init__(self, parent, height=8, bg=PAPER2, track=LINE, fill=BRAND):
+        super().__init__(parent, bg=bg, highlightthickness=0, bd=0, height=height, width=40)
+        self._h, self._track, self._fill = height, track, fill
+        self._max, self._val = 1.0, 0.0
+        self._drawn = None
+        self.bind("<Configure>", lambda e: self._draw())
+
+    def configure(self, cnf=None, **kw):
+        if "maximum" in kw:
+            self._max = max(1e-9, float(kw.pop("maximum")))
+        if "value" in kw:
+            self._val = float(kw.pop("value"))
+        if kw or cnf:
+            super().configure(cnf, **kw)
+        self._draw()
+
+    config = configure
+
+    def __getitem__(self, key):
+        if key == "value":
+            return self._val
+        if key == "maximum":
+            return self._max
+        return super().__getitem__(key)
+
+    def _draw(self):
+        w, h = self.winfo_width(), self._h
+        if w < 4:
+            return
+        fw = int(round(w * min(1.0, max(0.0, self._val / self._max))))
+        if self._drawn == (w, fw):
+            return
+        if not self._drawn or self._drawn[0] != w:
+            self.delete("track")
+            self._track_img = ImageTk.PhotoImage(round_img(w, h, h // 2, self._track))
+            self.create_image(0, 0, anchor="nw", image=self._track_img, tags="track")
+        self._drawn = (w, fw)
+        self.delete("fill")
+        if fw > 0:
+            self._fill_img = ImageTk.PhotoImage(round_img(max(fw, h), h, h // 2, self._fill, ss=2))
+            self.create_image(0, 0, anchor="nw", image=self._fill_img, tags="fill")
 
 
 class Segmented(tk.Canvas):
@@ -755,6 +900,9 @@ class App(RootBase):
         self._out_dirs = []
         self._loading = True
         self.dnd_ok = False
+        self.cards = []           # 右側步驟卡片（新手導覽用）
+        self._toast_job = None
+        self._tour = None
 
         self._theme()
         self._build()
@@ -777,6 +925,11 @@ class App(RootBase):
         self.after(100, self._poll)
         if UPDATE_AUTO:
             self.after(1500, self._auto_check_update)
+        self._bind_keys()
+        if IS_MAC:
+            self._mac_menu()
+        if TOUR_AUTO and not self.s.get("tour_done"):
+            self.after(900, self.start_tour)
         self.deiconify()
 
     # ---------- 外觀 ----------
@@ -834,6 +987,7 @@ class App(RootBase):
         k = self.k
         card = ttk.Frame(parent, style="Card.TFrame", padding=(int(14 * k), int(10 * k)))
         card.pack(fill="x", pady=(0, int(10 * k)))
+        self.cards.append(card)
         hd = ttk.Frame(card, style="C.TFrame")
         hd.pack(fill="x")
         NumBadge(hd, n, k).pack(side="left")
@@ -897,10 +1051,18 @@ class App(RootBase):
                  fg=DARK_MUTED, bg=DARK).pack(anchor="w")
         rt = tk.Frame(head, bg=DARK)
         rt.pack(side="right")
-        about = tk.Label(rt, text="關於", font=(UI_FONT, fs(9)), fg=BRAND, bg=DARK, cursor="hand2")
-        about.pack(side="right")
-        about.bind("<Button-1>", lambda e: self.show_about())
-        tk.Label(rt, text=f"v{APP_VERSION}   ", font=(self.mono_font, fs(8)), fg=DARK_MUTED, bg=DARK).pack(side="right")
+        for i, (t, cmd) in enumerate((("關於", self.show_about), ("使用說明", self.show_help),
+                                      ("新手導覽", self.start_tour))):
+            if i:
+                tk.Label(rt, text="·", font=(UI_FONT, fs(9)), fg="#4A4A52", bg=DARK).pack(side="right", padx=int(6 * k))
+            lb = tk.Label(rt, text=t, font=(UI_FONT, fs(9)), fg=BRAND if t == "新手導覽" else DARK_INK, bg=DARK,
+                          cursor="hand2")
+            lb.pack(side="right")
+            lb.bind("<Button-1>", lambda e, c=cmd: c())
+            lb.bind("<Enter>", lambda e, w=lb: w.configure(fg=BRAND))
+            lb.bind("<Leave>", lambda e, w=lb, t=t: w.configure(fg=BRAND if t == "新手導覽" else DARK_INK))
+        tk.Label(rt, text=f"v{APP_VERSION}", font=(self.mono_font, fs(8)), fg=DARK_MUTED,
+                 bg=DARK).pack(side="right", padx=(0, int(18 * k)))
         tk.Frame(self, bg=BRAND, height=max(2, int(3 * k))).pack(fill="x")
         self._build_update_bar()
 
@@ -917,7 +1079,7 @@ class App(RootBase):
         self.prog = tk.Frame(foot, bg=PAPER2)
         self.lbl_prog = tk.Label(self.prog, bg=PAPER2, fg=INK, font=(UI_FONT, fs(10), "bold"))
         self.lbl_prog.pack(side="left")
-        self.pb = ttk.Progressbar(self.prog, mode="determinate")
+        self.pb = Bar(self.prog, height=max(6, int(8 * k)))
         self.pb.pack(side="left", fill="x", expand=True, padx=(int(12 * k), int(12 * k)))
 
         body = self.body_frame = ttk.Frame(self, padding=(int(20 * k), int(14 * k), int(20 * k), int(10 * k)))
@@ -971,8 +1133,10 @@ class App(RootBase):
         self.btn_empty_add.pack(side="left")
         ttk.Button(row, text="選擇資料夾", style="CBig.TButton", command=self.add_folder).pack(side="left",
                                                                                           padx=(int(10 * k), 0))
+        tk.Label(box, text=f"快捷鍵 {MOD_TXT}O 加入檔案　·　第一次使用？點右上角「新手導覽」", bg=CARD, fg="#8A8780",
+                 font=(UI_FONT, fs(9))).pack(pady=(int(12 * k), 0))
         tips = self.empty_tips = tk.Frame(box, bg=CARD)
-        tips.pack(pady=(int(28 * k), 0))
+        tips.pack(pady=(int(24 * k), 0))
         for i, (t, d_) in enumerate((("① 加入圖片", "拖進來或按上面按鈕"), ("② 選用途", "右邊選類別與用途"),
                                      ("③ 開始轉換", "按右下角按鈕"))):
             f = tk.Frame(tips, bg=CARD)
@@ -1081,7 +1245,7 @@ class App(RootBase):
                                      highlightbackground=BRAND, highlightcolor=BRAND)
 
         # 預覽卡片
-        pv = ttk.Frame(f, style="Card.TFrame", padding=(int(14 * k), int(10 * k)))
+        pv = self.pv_card = ttk.Frame(f, style="Card.TFrame", padding=(int(14 * k), int(10 * k)))
         pv.grid(row=2, column=0, sticky="nsew", pady=(int(12 * k), 0))
         pv.columnconfigure(0, weight=1)
         pv.rowconfigure(1, weight=1)
@@ -1200,7 +1364,7 @@ class App(RootBase):
     def _build_settings(self, right):
         k = self.k
         # 輸出摘要（深色卡）
-        sm = RoundBox(right, fill=DARK, bg=PAPER, radius=int(12 * k), pad=(int(14 * k), int(12 * k)))
+        sm = self.sum_box = RoundBox(right, fill=DARK, bg=PAPER, radius=int(12 * k), pad=(int(14 * k), int(12 * k)))
         sm.pack(fill="x", pady=(0, int(10 * k)))
         tk.Label(sm.inner, text="輸出摘要", bg=DARK, fg=DARK_MUTED, font=(UI_FONT, fs(8))).pack(anchor="w")
         self.sum_chips = tk.Frame(sm.inner, bg=DARK)
@@ -1433,7 +1597,7 @@ class App(RootBase):
         hint = p.get("hint", "")
         if p.get("slug"):
             hint += "（檔名自動轉英文小寫、空白換成連字號）"
-        self.lbl_hint.configure(text=hint)
+        self.lbl_hint.configure(text=nbsp(hint))
         # 「自訂」用途要自己設尺寸 → 自動展開「③ 尺寸」
         if (not p.get("apply", True)) != self.body_rs._open:
             self.body_rs.toggle()
@@ -1475,12 +1639,26 @@ class App(RootBase):
             self.w_up.pack(anchor="w", pady=(6, 0))
         if multi:
             self.lbl_multi.pack(fill="x")
-        self.lbl_multi.configure(text=("固定輸出：" + "、".join(f"{w}×{h}" for _, w, h in multi) + "（置中裁切）")
+        self.lbl_multi.configure(text=nbsp("固定輸出：" + "、".join(f"{w}×{h}" for _, w, h in multi) + "（置中裁切）")
                                  if multi else "")
+        if self._toast_job:  # 使用者改了設定：提示收掉，馬上顯示最新狀態
+            self.after_cancel(self._toast_job)
+            self._toast_job = None
         self._update_summary()
+        self._reset_status()
         self._refresh_outnames()
         self._update_footer()
         self._schedule_preview()
+
+    def _reset_status(self):
+        """設定改了，上一次的轉換結果就不適用 → 狀態回到「待轉換」"""
+        if self.busy:
+            return
+        for p in self.files:
+            if self.status.get(p, ("待轉換",))[0] not in ("待轉換", "無法讀取"):
+                self._set_status(p, "待轉換", "", see=False)
+        if self.btn_open.winfo_manager():
+            self.btn_open.pack_forget()
 
     def _size_text(self, opt, short=False):
         """尺寸設定的白話說明"""
@@ -1556,18 +1734,37 @@ class App(RootBase):
         self._add(out)
 
     def _add(self, paths):
+        if self.busy:
+            self._toast("轉換中，等轉完再加入圖片", "warn")
+            return
         known = set(self.files)
-        new = []
+        new, dup, bad = [], 0, 0
         for p in map(Path, paths):
-            if p.suffix.lower() in SUPPORTED and p not in known and p.is_file():
+            if not p.is_file():
+                continue
+            if p.suffix.lower() not in SUPPORTED:
+                bad += 1
+            elif p in known:
+                dup += 1
+            else:
                 self.files.append(p)
                 known.add(p)
                 new.append(p)
                 self.info[p] = probe(p)
-                self.status[p] = ("待轉換", "")
+                self.status[p] = ("待轉換", "") if self.info[p] != "無法讀取" else ("無法讀取", "err")
         if new:
             threading.Thread(target=self._thumb_worker, args=(new,), daemon=True).start()
         self._refresh_list(select=[0] if self.files and not self.tree.selection() else None)
+        msg = [f"已加入 {len(new)} 張"] if new else []
+        if dup:
+            msg.append(f"略過 {dup} 張重複的圖片")
+        if bad:
+            msg.append(f"略過 {bad} 個不支援的檔案（支援 JPG、PNG、GIF、BMP、TIFF、WebP）")
+        unread = sum(1 for p in new if self.info.get(p) == "無法讀取")
+        if unread:
+            msg.append(f"{unread} 張無法讀取（檔案可能損壞）")
+        if msg and (dup or bad or unread or len(new) > 1):
+            self._toast("，".join(msg), "warn" if (dup or bad or unread) else "ok")
 
     def _thumb_worker(self, paths):
         """背景產生清單縮圖（圓角、置中裁成正方形）"""
@@ -1617,13 +1814,48 @@ class App(RootBase):
         self._update_footer()
         self._schedule_preview()
 
-    def _update_footer(self):
+    def _readiness(self, opt=None):
+        """可不可以開始轉換：回傳（可以, 原因）"""
+        opt = opt or self._collect(save=False)
+        if not self.files:
+            return False, "先加入要轉換的圖片"
+        if opt["naming"] not in ("keep", "serial", "line", "generic") and not opt["base"]:
+            return False, "先在「① 用途與檔名」填 " + ("SKU 或活動代稱" if opt["naming"] == "slider" else "SKU")
+        if opt["out_mode"] == "custom" and not opt["out_dir"]:
+            return False, "「④ 輸出位置」選了自訂，請按「瀏覽…」選資料夾"
+        if opt["naming"] == "slider" and len(self.files) > 1:
+            return False, "Slider 一次只能轉一張，請只留一張圖"
+        return True, ""
+
+    def _toast(self, text, kind="ok", ms=None):
+        """底部列暫時顯示一則提示，幾秒後回到原本的摘要"""
+        if self.busy:
+            return
+        self._last_toast = text
+        ms = ms or (2500 if kind == "ok" else 5000)
+        if self._toast_job:
+            self.after_cancel(self._toast_job)
+        self.lbl_status.configure(text=text, fg={"ok": OK, "warn": "#A15C07", "err": DANGER}.get(kind, MUTED))
+
+        def done():
+            self._toast_job = None
+            self._update_footer(force=True)
+        self._toast_job = self.after(ms, done)
+
+    def _update_footer(self, force=False):
         if self.busy or not hasattr(self, "lbl_status"):
+            return
+        opt = self._collect(save=False)
+        ok, why = self._readiness(opt)
+        self.btn_go.state(["!disabled"] if ok else ["disabled"])
+        if self._toast_job and not force:
             return
         if not self.files:
             self.lbl_status.configure(text="還沒有圖片 · 先加入要轉換的圖片", fg=MUTED)
             return
-        opt = self._collect(save=False)
+        if not ok:
+            self.lbl_status.configure(text="還不能轉換：" + why, fg=ACCENT)
+            return
         total = sum(p.stat().st_size for p in self.files if p.exists())
         txt = f"共 {len(self.files)} 張 · 原始 {human(total)}"
         if self._pv_ratio and not opt.get("multi"):
@@ -1648,14 +1880,15 @@ class App(RootBase):
                     txt = "（Slider 一次只轉一張）"
             self.tree.set(str(i), "out", txt)
 
-    def _set_status(self, p, text, tag=""):
+    def _set_status(self, p, text, tag="", see=True):
         self.status[p] = (text, tag)
         if p in self.files:
             iid = str(self.files.index(p))
             if self.tree.exists(iid):
                 self.tree.set(iid, "status", text)
                 self.tree.item(iid, tags=(tag,) if tag else ())
-                self.tree.see(iid)
+                if see:
+                    self.tree.see(iid)
 
     def _selected_idx(self):
         return [int(i) for i in self.tree.selection()]
@@ -1861,10 +2094,29 @@ class App(RootBase):
             self._ask("info", "請先加入要轉換的圖片（可以直接拖進視窗）。")
             return
         opt = self._collect()
-        if opt["out_mode"] == "custom" and not opt["out_dir"]:
+        ok, why = self._readiness(opt)
+        if not ok:
+            if "輸出位置" in why and not self.body_out._open:
+                self.body_out.toggle()
+            if "SKU" in why:
+                self.w_base.focus_set()
+            self._ask("warn", why + "。")
+            return
+        # 先確認每個輸出資料夾都能寫入，免得轉到一半才失敗
+        bad = []
+        for d in sorted({t[0].parent for i, f in enumerate(self.files) for t in make_targets(f, i, len(self.files), opt)}):
+            try:
+                d.mkdir(parents=True, exist_ok=True)
+                probe_f = d / f".moksa-write-test-{os.getpid()}"
+                probe_f.write_bytes(b"")
+                probe_f.unlink()
+            except OSError as e:
+                bad.append(f"{d}\n（{friendly_error(e)}）")
+        if bad:
             if not self.body_out._open:
                 self.body_out.toggle()
-            self._ask("warn", "輸出位置選了「自訂」，請按「瀏覽…」選一個資料夾。")
+            self._ask("warn", "這個資料夾不能存檔：\n\n" + "\n".join(bad[:3]) +
+                      "\n\n請到「④ 輸出位置」選「自訂」，改存到桌面或其他資料夾。")
             return
         if opt["naming"] not in ("keep", "serial", "line", "generic") and not opt["base"]:
             self.w_base.focus_set()
@@ -1897,12 +2149,40 @@ class App(RootBase):
             self.btn_stop.configure(state="normal")
             self.prog.pack(side="left", fill="x", expand=True)
             self.pb.configure(maximum=max(1, total), value=done)
-            self.lbl_prog.configure(text=f"{done} / {total} 張")
+            self.lbl_prog.configure(text=f"準備中… 0 / {total} 張")
+            # 進度條動畫：_pb_real 是實際做完的量（可以是小數，一張圖有多個輸出檔時逐檔前進），
+            # _pb_cap 是正在轉的這張做完時的位置；轉一張的期間進度條會慢慢往前，不會停在 0 再跳到完成
+            self._pb_val = float(done)
+            self._pb_real = float(done)
+            self._pb_cap = float(done)
+            self._pb_total = max(1, total)
+            self._pb_t0 = time.monotonic()
+            self._pb_tick()
         else:
             self.prog.pack_forget()
             self.btn_stop.pack_forget()
             self.btn_go.configure(state="normal", text="開始轉換")
             self.lbl_status.pack(side="left", fill="x", expand=True)
+
+    def _pb_tick(self):
+        """每 30ms 把進度條往目標推一點：追實際進度用快的速度，轉一張的期間用慢的速度往前爬（最多爬到這張的 85%）"""
+        if not self.prog.winfo_exists() or not self.busy:
+            return
+        v, real, cap = self._pb_val, self._pb_real, self._pb_cap
+        if v < real - 1e-3:
+            v += (real - v) * 0.35
+        elif cap > real:
+            # 轉一張的期間：照經過時間慢慢往前（t/(t+τ) 曲線，越久越慢但不會停住），最多到這張的 90%
+            done_files = int(real)
+            tau = 0.6 * (time.monotonic() - self._run_t0) / done_files if done_files else 3.0
+            t = time.monotonic() - self._pb_t0
+            goal = real + (cap - real) * 0.9 * t / (t + max(0.2, tau))
+            v += max(0.0, goal - v) * 0.3
+        else:
+            v += (real - v) * 0.35
+        self._pb_val = v
+        self.pb.configure(value=v)
+        self.after(30, self._pb_tick)
 
     def _run(self, files, opt):
         ok = fail = skip = 0
@@ -1914,11 +2194,15 @@ class App(RootBase):
                 self.q.put(("log", "已停止。", "warn"))
                 break
             self.q.put(("status", src, "轉換中…", "run"))
+            self.q.put(("progress", i, len(files), True))
             try:
                 targets = make_targets(src, i, len(files), opt)
+                nt = max(1, len(targets))
                 f_old = f_new = f_ok = f_skip = 0
                 warn = False
-                for dst, status, old, new, note in process(src, targets, opt, produced):
+                for j, (dst, status, old, new, note) in enumerate(process(src, targets, opt, produced)):
+                    if j + 1 < nt:  # 一張圖輸出多個檔（例如 LINE 圖文選單 3 種尺寸）：每個檔做完就前進一點
+                        self.q.put(("progress", i + (j + 1) / nt, len(files), True))
                     if status == "完成":
                         ok += 1
                         f_ok += 1
@@ -1937,17 +2221,19 @@ class App(RootBase):
                 tot_old += src.stat().st_size
                 if f_ok:
                     pct = (1 - (f_new / f_ok) / f_old) * 100 if f_old else 0
-                    txt = (f"✓ −{pct:.0f}%" if pct >= 0 else f"✓ +{-pct:.0f}%") if f_ok == 1 else f"✓ {f_ok} 個檔"
+                    txt = (f"完成 −{pct:.0f}%" if pct >= 0 else f"完成 +{-pct:.0f}%") if f_ok == 1 else f"完成 {f_ok} 個檔"
                     if warn:
-                        txt = "⚠ " + txt[2:] + " 注意"
-                    self.q.put(("status", src, txt, "warn" if warn else "ok"))
+                        txt = "注意 " + txt[3:] + "（見紀錄）"
+                    self.q.put(("status", src, txt, "warn" if warn else ""))
                 else:
-                    self.q.put(("status", src, "－ 略過", "warn"))
+                    self.q.put(("status", src, "略過（見紀錄）", "warn"))
             except Exception as e:
                 fail += 1
-                self.q.put(("log", f"✗ 失敗 {src.name}：{e}", "err"))
-                self.q.put(("status", src, "✕ 失敗", "err"))
-            self.q.put(("progress", i + 1, len(files)))
+                self.q.put(("log", f"✗ 失敗 {src.name}：{friendly_error(e)}（{type(e).__name__}: {e}）", "err"))
+                self.q.put(("status", src, "失敗（見紀錄）", "err"))
+                if isinstance(e, OSError) and getattr(e, "errno", None) == 28:  # 磁碟滿了：後面也會失敗，直接停
+                    self.stop_flag.set()
+            self.q.put(("progress", i + 1, len(files), False))
         if self.stop_flag.is_set():
             for src in files:
                 self.q.put(("status_if", src, "等待中", "已停止", ""))
@@ -1976,34 +2262,28 @@ class App(RootBase):
                     if self.status.get(msg[1], ("",))[0] == msg[2]:
                         self._set_status(msg[1], msg[3], msg[4])
                 elif kind == "progress":
-                    done, total = msg[1], msg[2]
-                    self.pb.configure(value=done)
-                    txt = f"{done} / {total} 張"
-                    if 0 < done < total:
+                    done, total, running = msg[1], msg[2], msg[3]
+                    self._pb_real = max(float(done), self._pb_val)
+                    self._pb_cap = float(min(total, int(done) + 1)) if running else float(done)
+                    self._pb_t0 = time.monotonic()
+                    files_done = int(done)
+                    if running and files_done < total:
+                        txt = f"正在轉第 {files_done + 1} 張，共 {total} 張"
+                    else:
+                        txt = f"{files_done} / {total} 張"
+                    if 0 < files_done < total:
                         left = (time.monotonic() - self._run_t0) / done * (total - done)
                         txt += f" · 剩約 {max(1, round(left))} 秒" if left < 90 else f" · 剩約 {round(left / 60)} 分鐘"
                     self.lbl_prog.configure(text=txt)
                 elif kind == "done":
-                    _, ok, skip, fail, to, tn, dirs = msg
-                    self._log(f"── 完成：輸出 {ok} 個、略過 {skip}、失敗 {fail}｜來源 {human(to)}，輸出 {human(tn)} ──", "head")
-                    for d in dirs:
-                        self._log(f"   輸出資料夾：{d}", "head")
-                    self.busy = False
-                    self._set_running(False)
-                    self._out_dirs = dirs
-                    txt = f"完成：輸出 {ok} 個檔案"
-                    if to and tn:
-                        txt += f"，{human(to)} → {human(tn)}（{diff_text(to, tn)}）"
-                    if skip:
-                        txt += f"，略過 {skip}"
-                    if fail:
-                        txt += f"，失敗 {fail}（看「轉換紀錄」）"
-                    self.lbl_status.configure(text=txt, fg=DANGER if fail else OK)
-                    if fail or skip:
-                        self.v_tab.set("log")
-                        self._switch_tab()
-                    if ok and dirs:
-                        self.btn_open.pack(side="right", padx=(0, int(10 * self.k)), after=self.btn_go)
+                    # 先讓進度條跑滿、停一下，再換成完成摘要（不然轉得快時看起來像直接跳到完成）
+                    n = int(self._pb_total)
+                    if self.stop_flag.is_set():
+                        self.lbl_prog.configure(text=f"已停止（{int(self._pb_real)} / {n} 張）")
+                    else:
+                        self._pb_real = self._pb_cap = float(n)
+                        self.lbl_prog.configure(text=f"{n} / {n} 張 · 完成")
+                    self.after(600, self._finish_run, msg)
                 elif kind == "preview":
                     _, tok, orig, out, old, new, meta, notes, warn, single = msg
                     if tok != self._pv_token:
@@ -2016,6 +2296,29 @@ class App(RootBase):
         except queue.Empty:
             pass
         self.after(80, self._poll)
+
+    def _finish_run(self, msg):
+        """進度條跑滿後：寫紀錄、底部列換回完成摘要"""
+        _, ok, skip, fail, to, tn, dirs = msg
+        self._log(f"── 完成：輸出 {ok} 個、略過 {skip}、失敗 {fail}｜來源 {human(to)}，輸出 {human(tn)} ──", "head")
+        for d in dirs:
+            self._log(f"   輸出資料夾：{d}", "head")
+        self.busy = False
+        self._set_running(False)
+        self._out_dirs = dirs
+        txt = f"完成：輸出 {ok} 個檔案"
+        if to and tn:
+            txt += f"，{human(to)} → {human(tn)}（{diff_text(to, tn)}）"
+        if skip:
+            txt += f"，略過 {skip}"
+        if fail:
+            txt += f"，失敗 {fail}（看「轉換紀錄」）"
+        self.lbl_status.configure(text=txt, fg=DANGER if fail else OK)
+        if fail or skip:
+            self.v_tab.set("log")
+            self._switch_tab()
+        if ok and dirs:
+            self.btn_open.pack(side="right", padx=(0, int(10 * self.k)), after=self.btn_go)
 
     def _log(self, text, tag=None):
         self.log.configure(state="normal")
@@ -2233,9 +2536,249 @@ class App(RootBase):
         w.grab_set()
 
     def _on_close(self):
+        if self.busy and not messagebox.askyesno(APP_TITLE, "還在轉換中，確定要關閉嗎？\n（已經轉好的檔案會保留）",
+                                                 parent=self):
+            return
         self._collect()
         self.stop_flag.set()
         self.destroy()
+
+    # ---------- 快捷鍵、Mac 選單 ----------
+    def _bind_keys(self):
+        self.bind_all(f"<{MOD}-o>", lambda e: (self.add_files(), "break")[1])
+        self.bind_all(f"<{MOD}-O>", lambda e: (self.add_files(), "break")[1])
+        self.bind_all(f"<{MOD}-Return>", lambda e: (self.start(), "break")[1])
+        self.bind_all("<F1>", lambda e: (self.show_help(), "break")[1])
+        self.bind_all("<Escape>", lambda e: self.end_tour() if self._tour else None, add="+")
+
+    def _mac_menu(self):
+        """Mac 上方選單列：關於、檢查更新、檔案、說明"""
+        mb = tk.Menu(self)
+        app = tk.Menu(mb, name="apple", tearoff=0)
+        mb.add_cascade(menu=app)
+        app.add_command(label="關於 Moksa Web 圖片轉換工具", command=self.show_about)
+        app.add_command(label="檢查更新…", command=lambda: (self.show_about(),))
+        fm = tk.Menu(mb, tearoff=0)
+        mb.add_cascade(label="檔案", menu=fm)
+        fm.add_command(label="加入檔案…", accelerator="Command-O", command=self.add_files)
+        fm.add_command(label="加入資料夾…", command=self.add_folder)
+        fm.add_separator()
+        fm.add_command(label="開始轉換", accelerator="Command-Return", command=self.start)
+        fm.add_command(label="開啟輸出資料夾", command=self.open_output)
+        hm = tk.Menu(mb, name="help", tearoff=0)
+        mb.add_cascade(label="說明", menu=hm)
+        hm.add_command(label="新手導覽", command=self.start_tour)
+        hm.add_command(label="使用說明", command=self.show_help)
+        hm.add_command(label="線上教學（GitHub）", command=lambda: webbrowser.open(f"https://github.com/{UPDATE_REPO}"))
+        self.configure(menu=mb)
+        try:
+            self.createcommand("tkAboutDialog", self.show_about)
+        except tk.TclError:
+            pass
+
+    # ---------- 說明視窗 ----------
+    def show_help(self, section=0):
+        k = self.k
+        if getattr(self, "_help", None) is not None and self._help.winfo_exists():
+            self._help.lift()
+            self._help_show(section)
+            return
+        w = self._help = tk.Toplevel(self)
+        w.title("使用說明")
+        w.configure(bg=PAPER)
+        w.transient(self)
+        w.geometry(f"{int(820 * k)}x{int(560 * k)}")
+        side = tk.Frame(w, bg=DARK, width=int(190 * k))
+        side.pack(side="left", fill="y")
+        side.pack_propagate(False)
+        tk.Label(side, text="使用說明", bg=DARK, fg=DARK_INK, font=(UI_FONT, fs(12), "bold")).pack(
+            anchor="w", padx=int(18 * k), pady=(int(18 * k), int(12 * k)))
+        self._help_items = []
+        for i, (title, _) in enumerate(HELP):
+            lb = tk.Label(side, text=title, bg=DARK, fg=DARK_MUTED, font=(UI_FONT, fs(10)), anchor="w",
+                          padx=int(18 * k), pady=int(7 * k), cursor="hand2")
+            lb.pack(fill="x")
+            lb.bind("<Button-1>", lambda e, i=i: self._help_show(i))
+            self._help_items.append(lb)
+        foot = tk.Frame(side, bg=DARK)
+        foot.pack(side="bottom", fill="x", padx=int(18 * k), pady=int(16 * k))
+        for t, cmd in (("▶ 新手導覽", lambda: (w.destroy(), self.start_tour())),
+                       ("線上教學 ↗", lambda: webbrowser.open(f"https://github.com/{UPDATE_REPO}#readme"))):
+            lb = tk.Label(foot, text=t, bg=DARK, fg=BRAND, font=(UI_FONT, fs(9)), cursor="hand2", anchor="w")
+            lb.pack(fill="x", pady=2)
+            lb.bind("<Button-1>", lambda e, c=cmd: c())
+        body = tk.Frame(w, bg=PAPER, padx=int(24 * k), pady=int(18 * k))
+        body.pack(side="left", fill="both", expand=True)
+        self._help_title = tk.Label(body, bg=PAPER, fg=INK, font=(UI_FONT, fs(15), "bold"), anchor="w")
+        self._help_title.pack(fill="x")
+        tk.Frame(body, bg=BRAND, height=max(2, int(3 * k)), width=int(40 * k)).pack(anchor="w", pady=(int(6 * k), int(12 * k)))
+        t = self._help_text = tk.Text(body, wrap="word", relief="flat", bg=PAPER, fg=INK, font=(UI_FONT, fs(10)),
+                                      spacing1=2, spacing3=4, padx=0, pady=0, cursor="arrow")
+        sb = ttk.Scrollbar(body, orient="vertical", command=t.yview)
+        t.configure(yscrollcommand=sb.set)
+        sb.pack(side="right", fill="y")
+        t.pack(fill="both", expand=True)
+        t.tag_configure("h", font=(UI_FONT, fs(11), "bold"), foreground=INK, spacing1=int(8 * k))
+        t.tag_configure("q", font=(UI_FONT, fs(10), "bold"), foreground=ACCENT, spacing1=int(8 * k))
+        w.bind("<Escape>", lambda e: w.destroy())
+        self._help_show(section)
+        w.update_idletasks()
+        x = self.winfo_rootx() + (self.winfo_width() - w.winfo_width()) // 2
+        y = self.winfo_rooty() + (self.winfo_height() - w.winfo_height()) // 3
+        w.geometry(f"+{max(0, x)}+{max(0, y)}")
+
+    def _help_show(self, i):
+        title, text = HELP[i]
+        for j, lb in enumerate(self._help_items):
+            lb.configure(bg="#1F1F24" if j == i else DARK, fg=DARK_INK if j == i else DARK_MUTED)
+        self._help_title.configure(text=title)
+        t = self._help_text
+        t.configure(state="normal")
+        t.delete("1.0", "end")
+        for line in text.split("\n"):
+            tag = ()
+            if line.startswith("Q："):
+                tag = ("q",)
+            elif re.match(r"^\d\. ", line) or (line and not line.startswith(("・", " ", "（")) and len(line) <= 14
+                                                and "：" not in line and "　" not in line):
+                tag = ("h",)
+            t.insert("end", line + "\n", tag)
+        t.configure(state="disabled")
+        t.yview_moveto(0)
+
+    # ---------- 新手導覽 ----------
+    def _tour_steps(self):
+        steps = []
+        if self.files:
+            steps.append((self.bar_items[0], "加入圖片",
+                          "把圖片或資料夾拖進視窗，或按「＋ 加入檔案」。一次可以放很多張，清單順序就是流水號順序。"))
+        else:
+            steps.append((self.view_empty, "加入圖片",
+                          "把圖片或資料夾拖到這個框裡，或按「＋ 加入檔案」。一次可以放很多張。"))
+        steps.append((self.cards[0], "選用途、填 SKU",
+                      "先選類別（例如 Instagram、台灣電商平台），再選用途：尺寸、格式、品質、檔名規則會自動帶入。"
+                      "電商用途要填 SKU，檔名會照規則產生。"))
+        steps.append((self.sum_box, "確認輸出",
+                      "這裡寫著會輸出什麼：格式、品質、尺寸、檔案上限，以及檔名長什麼樣子。"))
+        if self.files:
+            steps.append((self.pv_card, "預覽",
+                          "點清單中的圖，會真的轉一次，告訴你轉完多大、省多少。打開「顯示安全區」可以看文字該放哪。"))
+        steps.append((self.btn_go, "開始轉換",
+                      "按這裡開始。完成後按「開啟輸出資料夾」就看得到檔案。"
+                      "想再看一次導覽，點右上角的「新手導覽」；詳細說明在「使用說明」。"))
+        return steps
+
+    def start_tour(self):
+        if self.busy:
+            return
+        self.end_tour(save=False)
+        k = self.k
+        self._tour = {"i": 0, "steps": self._tour_steps(),
+                      "hl": [tk.Frame(self, bg=BRAND) for _ in range(4)],
+                      "card": tk.Frame(self, bg=DARK, padx=int(18 * k), pady=int(14 * k),
+                                       highlightthickness=1, highlightbackground="#3A3A40")}
+        c = self._tour["card"]
+        top = tk.Frame(c, bg=DARK)
+        top.pack(fill="x")
+        self._tour["n"] = tk.Label(top, bg=DARK, fg=BRAND, font=(self.mono_font, fs(9)))
+        self._tour["n"].pack(side="left")
+        x = tk.Label(top, text="✕", bg=DARK, fg=DARK_MUTED, font=(UI_FONT, fs(10)), cursor="hand2")
+        x.pack(side="right")
+        x.bind("<Button-1>", lambda e: self.end_tour())
+        self._tour["t"] = tk.Label(c, bg=DARK, fg=DARK_INK, font=(UI_FONT, fs(13), "bold"), anchor="w")
+        self._tour["t"].pack(fill="x", pady=(int(4 * k), int(4 * k)))
+        self._tour["d"] = tk.Label(c, bg=DARK, fg="#CFCDC6", font=(UI_FONT, fs(10)), justify="left", anchor="w",
+                                   wraplength=int(340 * k))
+        self._tour["d"].pack(fill="x")
+        row = tk.Frame(c, bg=DARK)
+        row.pack(fill="x", pady=(int(14 * k), 0))
+        skip = tk.Label(row, text="略過導覽", bg=DARK, fg=DARK_MUTED, font=(UI_FONT, fs(9)), cursor="hand2")
+        skip.pack(side="left")
+        skip.bind("<Button-1>", lambda e: self.end_tour())
+        self._tour["next"] = ttk.Button(row, text="下一步", style="Accent.TButton", command=lambda: self._tour_go(1))
+        self._tour["next"].pack(side="right")
+        self._tour["prev"] = ttk.Button(row, text="上一步", command=lambda: self._tour_go(-1))
+        self._tour["prev"].pack(side="right", padx=(0, int(8 * k)))
+        self._tour["bind"] = self.bind("<Configure>", lambda e: self._tour_place() if e.widget is self else None, add="+")
+        self._tour_place()
+
+    def _tour_go(self, d):
+        t = self._tour
+        if not t:
+            return
+        i = t["i"] + d
+        if i >= len(t["steps"]):
+            self.end_tour()
+            return
+        t["i"] = max(0, i)
+        self._tour_place()
+
+    def _tour_place(self):
+        t = self._tour
+        if not t:
+            return
+        k = self.k
+        target, title, text = t["steps"][t["i"]]
+        n = len(t["steps"])
+        t["n"].configure(text=f"{t['i'] + 1} / {n}")
+        t["t"].configure(text=title)
+        t["d"].configure(text=nbsp(text))
+        t["prev"].state(["disabled"] if t["i"] == 0 else ["!disabled"])
+        t["next"].configure(text="開始使用" if t["i"] == n - 1 else "下一步")
+        # 目標在右側設定欄裡：先捲到看得到
+        if str(target).startswith(str(self.set_cv)):
+            self.update_idletasks()
+            cv = self.set_cv
+            total = float(str(cv.cget("scrollregion")).split()[3] or 1)
+            y_in = target.winfo_rooty() - cv.winfo_rooty() + cv.canvasy(0)
+            if not (cv.canvasy(0) <= y_in <= cv.canvasy(0) + cv.winfo_height() - target.winfo_height()):
+                cv.yview_moveto(max(0.0, (y_in - 20) / total))
+        self.update_idletasks()
+        rx, ry = target.winfo_rootx() - self.winfo_rootx(), target.winfo_rooty() - self.winfo_rooty()
+        tw, th = target.winfo_width(), target.winfo_height()
+        W, H = self.winfo_width(), self.winfo_height()
+        m, b = int(5 * k), max(2, int(3 * k))
+        x1, y1, x2, y2 = max(0, rx - m), max(0, ry - m), min(W, rx + tw + m), min(H, ry + th + m)
+        for f, (x, y, w, h) in zip(t["hl"], ((x1, y1, x2 - x1, b), (x1, y2 - b, x2 - x1, b),
+                                             (x1, y1, b, y2 - y1), (x2 - b, y1, b, y2 - y1))):
+            f.place(x=x, y=y, width=max(1, w), height=max(1, h))
+            f.lift()
+        c = t["card"]
+        c.place(x=0, y=0)
+        c.update_idletasks()
+        cw, ch = c.winfo_reqwidth(), c.winfo_reqheight()
+        gap = int(14 * k)
+        # 依目標位置放卡片：左右有空間就放旁邊，否則放下方或上方
+        if x1 - gap - cw >= 0 and tw < W * 0.6:
+            cx, cy = x1 - gap - cw, y1
+        elif x2 + gap + cw <= W and tw < W * 0.6:
+            cx, cy = x2 + gap, y1
+        elif y2 + gap + ch <= H:
+            cx, cy = x1 + (x2 - x1 - cw) // 2, y2 + gap
+        elif y1 - gap - ch >= 0:
+            cx, cy = x1 + (x2 - x1 - cw) // 2, y1 - gap - ch
+        else:
+            cx, cy = x1 + (x2 - x1 - cw) // 2, y1 + (y2 - y1 - ch) // 2
+        cx = min(max(int(8 * k), cx), W - cw - int(8 * k))
+        cy = min(max(int(8 * k), cy), H - ch - int(8 * k))
+        c.place(x=cx, y=cy)
+        c.lift()
+
+    def end_tour(self, save=True):
+        t = self._tour
+        if not t:
+            return
+        for f in t["hl"]:
+            f.destroy()
+        t["card"].destroy()
+        try:
+            self.unbind("<Configure>", t["bind"])
+        except tk.TclError:
+            pass
+        self._tour = None
+        if save:
+            self.s["tour_done"] = True
+            save_settings(self.s)
 
 
 def selftest(out_dir: str) -> int:
@@ -2276,8 +2819,8 @@ def uitest(out_dir: str, screen: str = "") -> int:
     """開視窗的介面測試（CI 用）：檢查拖放元件、字型、主題與各狀態的版面，截圖後自動關閉。
     用暫存的設定檔，不會改到使用者自己的設定。"""
     from PIL import ImageGrab
-    global SIM_SCREEN, SETTINGS_FILE, UPDATE_AUTO
-    UPDATE_AUTO = False
+    global SIM_SCREEN, SETTINGS_FILE, UPDATE_AUTO, TOUR_AUTO
+    UPDATE_AUTO = TOUR_AUTO = False
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     tag = ""
@@ -2313,7 +2856,9 @@ def uitest(out_dir: str, screen: str = "") -> int:
         app.update()
         try:
             if IS_MAC:
-                subprocess.run(["screencapture", "-x", str(out / name)], check=True, timeout=20)
+                x, y = app.winfo_rootx(), app.winfo_rooty() - 28
+                subprocess.run(["screencapture", "-x", f"-R{x},{y},{app.winfo_width()},{app.winfo_height() + 28}",
+                                str(out / name)], check=True, timeout=20)
             else:
                 x, y = app.winfo_rootx(), app.winfo_rooty()
                 ImageGrab.grab(bbox=(x - 8, y - 32, x + app.winfo_width() + 8, y + app.winfo_height() + 8),
@@ -2342,6 +2887,7 @@ def uitest(out_dir: str, screen: str = "") -> int:
         check("空白狀態：顯示拖放區、不顯示清單", app.view_empty.winfo_ismapped() and not app.view_list.winfo_ismapped())
         check("空白狀態：「加入檔案」大按鈕看得到", visible(app.btn_empty_add))
         check("「開始轉換」看得到", visible(app.btn_go))
+        check("沒有圖片時「開始轉換」是灰的", app.btn_go.instate(["disabled"]))
         # 選電商 SKU 規範 → 商品圖，填 SKU
         app.v_cat.set("電商 SKU 規範")
         app._on_cat()
@@ -2379,6 +2925,16 @@ def uitest(out_dir: str, screen: str = "") -> int:
         check("預覽大小徽章", "→" in app.lbl_size.cget("text") and app.pill_save.text,
               f"{app.lbl_size.cget('text')} {app.pill_save.text}")
         check("底部列預估", "預估輸出" in app.lbl_status.cget("text"), app.lbl_status.cget("text"))
+        check("填好 SKU 後「開始轉換」可以按", app.btn_go.instate(["!disabled"]))
+        app.v_base.set("")
+        app.update()
+        check("SKU 空白時「開始轉換」變灰並寫原因", app.btn_go.instate(["disabled"]) and "SKU" in app.lbl_status.cget("text"),
+              app.lbl_status.cget("text"))
+        app.v_base.set("TEST-001")
+        app._on_drop([str(src_dir)])  # 再加一次同樣的圖：應該提示略過重複
+        app.update()
+        check("重複加入會提示", "略過 4 張重複" in app.lbl_status.cget("text"), app.lbl_status.cget("text"))
+        app._update_footer(force=True)
         shot(f"3-加了圖之後{tag}.png")
         # 實際轉換到暫存資料夾
         app.v_out_mode.set("custom")
@@ -2403,7 +2959,7 @@ def uitest(out_dir: str, screen: str = "") -> int:
         check("轉換結果", outs == ["TEST-001pic.webp", "TEST-001pic1.webp", "TEST-001pic2.webp", "TEST-001pic3.webp"],
               "、".join(outs))
         sts = [app.status[p][0] for p in app.files]
-        check("清單狀態", all(t.startswith("✓") for t in sts), "、".join(sts))
+        check("清單狀態", all(t.startswith("完成") for t in sts), "、".join(sts))
         check("完成：「開啟輸出資料夾」", app.btn_open.winfo_ismapped(), app.lbl_status.cget("text"))
         if not seen["mid"]:
             lines.append("（轉換太快，沒截到轉換中的畫面）")
@@ -2435,6 +2991,37 @@ def uitest(out_dir: str, screen: str = "") -> int:
 
     def step4():
         shot(f"7-關於{tag}.png")
+        for c in app.winfo_children():
+            if isinstance(c, tk.Toplevel):
+                c.destroy()
+        app.update()
+        time.sleep(0.5)  # 等「關於」視窗的淡出動畫結束再截圖
+        app.update()
+        # 新手導覽
+        app.start_tour()
+        app.update()
+        check("新手導覽：第 1 步", app._tour and app._tour["card"].winfo_ismapped() and visible(app._tour["next"]),
+              f"共 {len(app._tour['steps'])} 步")
+        shot(f"9-導覽-1{tag}.png")
+        app._tour_go(1)
+        app.update()
+        check("新手導覽：第 2 步（選用途）卡片在視窗內", visible(app._tour["card"]))
+        shot(f"9-導覽-2{tag}.png")
+        while app._tour and app._tour["i"] < len(app._tour["steps"]) - 1:
+            app._tour_go(1)
+        app.update()
+        check("新手導覽：最後一步（開始轉換）", app._tour and app._tour["next"].cget("text") == "開始使用")
+        shot(f"9-導覽-3{tag}.png")
+        app._tour_go(1)
+        check("新手導覽：結束後記住", app._tour is None and app.s.get("tour_done") is True)
+        # 說明視窗
+        app.show_help(0)
+        app.update()
+        app._help.lift()
+        app.after(300)
+        check("使用說明視窗", app._help.winfo_ismapped() and app._help_title.cget("text") == "快速上手")
+        shot(f"10-使用說明{tag}.png")
+        app._help.destroy()
         # 更新提示列（用假資料，不連網）
         for c in app.winfo_children():
             if isinstance(c, tk.Toplevel):

@@ -10,6 +10,59 @@ Moksa Web 的免安裝圖片轉換工具，支援 Windows 與 macOS（Apple 晶�
 - 維護說明：[`MAINTAINING.md`](MAINTAINING.md)
 - 版本紀錄：[`CHANGELOG.md`](CHANGELOG.md)
 
+![Moksa Web WebP 圖片轉換工具](docs/images/02-loaded.webp)
+
+## 圖文教學
+
+### 1. 下載與開啟
+- **Windows**：下載 `…-windows.zip`，按右鍵「解壓縮全部」，點兩下 `MoksaWeb-WebP轉換工具.exe`。
+  跳出「Windows 已保護您的電腦」時，按「其他資訊」→「仍要執行」（沒有付費簽章，只有第一次會出現）。
+- **Mac**：Apple 晶片下載 `…-mac-arm64.dmg`，Intel 下載 `…-mac-x86_64.dmg`。打開後把 App 拖進「應用程式」。
+  第一次開啟：macOS 14 以前「按右鍵 → 打開」；macOS 15 以後到「系統設定 → 隱私權與安全性」按「仍要打開」。
+
+第一次開啟會出現**新手導覽**，一步一步帶你走完；之後可以從右上角「新手導覽」再看一次。
+
+![新手導覽](docs/images/06-tour.webp)
+
+### 2. 加入圖片
+把圖片或資料夾拖進虛線框，或按「＋ 加入檔案」（快捷鍵 Ctrl／⌘＋O）。支援 JPG、PNG、GIF、BMP、TIFF、WebP，一次可以放很多張。
+
+![空白狀態](docs/images/01-empty.webp)
+
+### 3. 選用途、填 SKU
+右側「① 用途與檔名」先選**類別**（網站 WordPress、LINE 官方帳號、Instagram、Facebook、Google 廣告、蝦皮、momo…），再選**用途**。
+尺寸、格式、品質、檔案上限、安全區、檔名規則都會自動帶入；右上角的**輸出摘要**會寫出結果。
+電商用途要填 SKU，例如 `ABC-001` → `ABC-001pic.webp`、`ABC-001pic1.webp`…
+
+點清單中的圖，下方會**真的轉一次**，告訴你轉完多大、省多少；打開「顯示安全區」可以看文字該放哪。
+
+![加入圖片後](docs/images/02-loaded.webp)
+
+### 4. 開始轉換
+按右下角「開始轉換」（Ctrl／⌘＋Enter）。轉換時會顯示進度與剩餘時間，清單的「狀態」欄寫出每張省了多少。
+完成後按「開啟輸出資料夾」。
+
+![轉換中](docs/images/03-converting.webp)
+![完成](docs/images/04-done.webp)
+
+「開始轉換」是灰色時，底部會用橘字寫出還缺什麼（例如還沒填 SKU）。
+
+### 5. 細部設定（需要時才用）
+「③ 尺寸」「④ 輸出位置」平常收成一行，點標題展開；壓縮強度、檔案上限、無損等在「進階設定」。
+
+![設定展開](docs/images/05-settings.webp)
+
+### 6. 使用說明與更新
+- 右上角「使用說明」（或按 F1）：快速上手、用途與檔名、預覽與安全區、尺寸與檔案上限、快捷鍵、常見問題。
+- 有新版本時，頁首下方會出現橘色提示，按「下載新版」即可；設定會自動沿用。
+
+![使用說明](docs/images/07-help.webp)
+![更新提示](docs/images/08-update.webp)
+
+Mac 版畫面：
+
+![Mac 版](docs/images/09-mac.webp)
+
 ## 資料夾結構
 
 ```

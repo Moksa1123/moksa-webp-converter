@@ -176,6 +176,14 @@ jobs:
           path: out
           pattern: "{windows,mac-*}"
           merge-multiple: true
+      - name: 另存一份不含版本號的檔名（官網按鈕可用固定網址 releases/latest/download/…）
+        run: |
+          cd out
+          for f in MoksaWeb-ImageConverter-*-windows.zip MoksaWeb-ImageConverter-*-mac-arm64.dmg MoksaWeb-ImageConverter-*-mac-x86_64.dmg; do
+            [ -e "$f" ] || continue
+            cp "$f" "$(echo "$f" | sed -E 's/-[0-9]+\.[0-9]+\.[0-9]+-/-/')"
+          done
+          ls -la
       - uses: softprops/action-gh-release@v3
         with:
           files: out/*
