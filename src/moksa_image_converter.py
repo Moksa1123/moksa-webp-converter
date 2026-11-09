@@ -55,7 +55,7 @@ IS_MAC = sys.platform == "darwin"
 
 APP_NAME = "Moksa Web"
 APP_TITLE = "Moksa Web WebP 圖片轉換工具"
-APP_VERSION = "1.6.1"
+APP_VERSION = "1.6.2"
 APP_URL = "https://moksaweb.com/"
 APP_ABOUT = ("台中的網站工程工作室。WordPress、WooCommerce、LINE 整合、n8n 與 AI 自動化、客製 ERP——"
              "從規劃、開發到上線維運，一個窗口負責到底。")
@@ -101,9 +101,14 @@ BRAND_FONT = "Space Grotesk"
 MONO_FONT = "JetBrains Mono"
 
 
+UI_SCALE = 1.15  # 整體字級（v1.6.2 使用者要求字大一點：全部放大約 15%）
+
+
 def fs(n: int) -> int:
-    """字級：程式裡的數字以 Windows（96 dpi）為準；Mac 的 Tk 以 72 dpi 計，放大 4/3 才會一樣大"""
-    return round(n * 4 / 3) if IS_MAC else n
+    """字級：程式裡的數字以 Windows（96 dpi）為準；Mac 的 Tk 以 72 dpi 計，放大 4/3 才會一樣大；再乘整體字級 UI_SCALE"""
+    # 8、9 點的小字乘 1.15 只多 1 點、看起來沒變，再多加 1 點
+    m = round(n * UI_SCALE) + (1 if n <= 9 else 0)
+    return round(m * 4 / 3) if IS_MAC else m
 
 BASE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).parent))
 ASSETS = BASE_DIR / "assets"
@@ -827,6 +832,10 @@ class Segmented(tk.Canvas):
         self._font = tkfont.Font(font=font or (UI_FONT, fs(9)))
         self._bold = tkfont.Font(font=font or (UI_FONT, fs(9)))
         self._bold.configure(weight="bold")
+        # 字放大時按鈕跟著長高、變寬（高度至少比字高 12px，寬度至少放得下所有選項）
+        need_h = self._bold.metrics("linespace") + 12
+        need_w = sum(self._bold.measure(t) + 24 for _, t in options) + 6
+        self.configure(height=max(int(height), need_h), width=max(int(width or 120), need_w))
         self._imgs = []
         self.bind("<Configure>", lambda e: self.redraw())
         self.bind("<Button-1>", self._click)
@@ -1004,6 +1013,9 @@ class App(RootBase):
             f = tkfont.nametofont(name)
             if name != "TkFixedFont":
                 f.configure(family=UI_FONT)
+            sz = f.cget("size")  # 系統預設字（清單、下拉選單等）也一起放大
+            if sz:
+                f.configure(size=round(sz * UI_SCALE))
         k = self.k
         st = ttk.Style(self)
         st.configure(".", font=(UI_FONT, fs(10)))
@@ -1139,7 +1151,8 @@ class App(RootBase):
 
         # ===== 右側設定 =====
         extra = 30 if IS_MAC else 0  # 蘋方字比較寬，Mac 右側欄加寬，「用途」名稱才放得下
-        self.right_w = int((400 + extra) * k) if self._W >= int(1200 * k) else int((370 + extra) * k)
+        # 字級放大（UI_SCALE）後右側欄也跟著加寬，「用途」名稱才放得下
+        self.right_w = int((400 + extra) * k * UI_SCALE) if self._W >= int(1200 * k) else int((370 + extra) * k * UI_SCALE)
         right = ttk.Frame(body, width=self.right_w)
         right.grid(row=0, column=1, sticky="ns", padx=(int(16 * k), 0))
         right.grid_propagate(False)
