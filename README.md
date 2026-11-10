@@ -121,3 +121,5 @@ Mac 版未做 Apple 簽章與公證，第一次開啟要放行：macOS 14 以前
 Moksa Web 名稱與 logo 不在 MIT 授權範圍內；改版再發布時請換成自己的名稱與圖示。
 
 © Moksa Web・台中的網站工程工作室　https://moksaweb.com/
+
+作者／維護者：ChengChun Chang（Moksa Web）
