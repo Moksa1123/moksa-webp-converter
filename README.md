@@ -16,7 +16,7 @@ Moksa Web 的免安裝圖片轉換工具，支援 Windows 與 macOS（Apple 晶�
 
 ### 1. 下載與開啟
 - **Windows**：下載 `…-windows.zip`，按右鍵「解壓縮全部」，點兩下 `MoksaWeb-WebP轉換工具.exe`。
-  跳出「Windows 已保護您的電腦」時，按「其他資訊」→「仍要執行」（沒有付費簽章，只有第一次會出現）。
+  Releases 的 Windows 版有數位簽章（發行者 Open Source Developer Cheng Chun Chang），開著「智慧型應用程式控制」的 Windows 11 也能打開；新版剛發布時偶爾仍會跳「Windows 已保護您的電腦」，按「其他資訊」→「仍要執行」即可。
 - **Mac**：Apple 晶片下載 `…-mac-arm64.dmg`，Intel 下載 `…-mac-x86_64.dmg`。打開後把 App 拖進「應用程式」。
   第一次開啟：macOS 14 以前「按右鍵 → 打開」；macOS 15 以後到「系統設定 → 隱私權與安全性」按「仍要打開」。
 

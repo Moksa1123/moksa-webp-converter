@@ -55,7 +55,7 @@ IS_MAC = sys.platform == "darwin"
 
 APP_NAME = "Moksa Web"
 APP_TITLE = "Moksa Web WebP 圖片轉換工具"
-APP_VERSION = "1.6.2"
+APP_VERSION = "1.6.3"
 APP_URL = "https://moksaweb.com/"
 APP_ABOUT = ("台中的網站工程工作室。WordPress、WooCommerce、LINE 整合、n8n 與 AI 自動化、客製 ERP——"
              "從規劃、開發到上線維運，一個窗口負責到底。")
