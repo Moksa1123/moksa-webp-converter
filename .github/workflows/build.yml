@@ -83,12 +83,16 @@ jobs:
               z.write(f, f.name)
           z.close()
           EOF
+          # 另外放一份可直接下載執行的 exe（GitHub 檔名不能用中文，所以用英文檔名）
+          cp dist/MoksaWebImageConverter.exe "MoksaWeb-ImageConverter-$VER-windows.exe"
         env:
           VER: ${{ steps.ver.outputs.v }}
       - uses: actions/upload-artifact@v7
         with:
           name: windows
-          path: MoksaWeb-ImageConverter-*-windows.zip
+          path: |
+            MoksaWeb-ImageConverter-*-windows.zip
+            MoksaWeb-ImageConverter-*-windows.exe
 
   macos:
     strategy:
@@ -169,7 +173,7 @@ jobs:
           awk -v v="$v" 'index($0, "## v" v "（") == 1 {f=1; next} /^## v/ {if (f) exit} f' CHANGELOG.md > notes.md
           echo "" >> notes.md
           echo "---" >> notes.md
-          echo "Windows 下載 …-windows.zip；Mac 依晶片下載 …-mac-arm64.dmg（Apple 晶片）或 …-mac-x86_64.dmg（Intel）。" >> notes.md
+          echo "Windows 下載 …-windows.exe（點兩下就能用）或 …-windows.zip（含使用說明）；Mac 依晶片下載 …-mac-arm64.dmg（Apple 晶片）或 …-mac-x86_64.dmg（Intel）。" >> notes.md
           cat notes.md
       - uses: actions/download-artifact@v8
         with:
@@ -179,7 +183,7 @@ jobs:
       - name: 另存一份不含版本號的檔名（官網按鈕可用固定網址 releases/latest/download/…）
         run: |
           cd out
-          for f in MoksaWeb-ImageConverter-*-windows.zip MoksaWeb-ImageConverter-*-mac-arm64.dmg MoksaWeb-ImageConverter-*-mac-x86_64.dmg; do
+          for f in MoksaWeb-ImageConverter-*-windows.zip MoksaWeb-ImageConverter-*-windows.exe MoksaWeb-ImageConverter-*-mac-arm64.dmg MoksaWeb-ImageConverter-*-mac-x86_64.dmg; do
             [ -e "$f" ] || continue
             cp "$f" "$(echo "$f" | sed -E 's/-[0-9]+\.[0-9]+\.[0-9]+-/-/')"
           done

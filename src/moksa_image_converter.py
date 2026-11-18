@@ -55,7 +55,7 @@ IS_MAC = sys.platform == "darwin"
 
 APP_NAME = "Moksa Web"
 APP_TITLE = "Moksa Web WebP 圖片轉換工具"
-APP_VERSION = "1.6.3"
+APP_VERSION = "1.6.4"
 APP_URL = "https://moksaweb.com/"
 APP_ABOUT = ("台中的網站工程工作室。WordPress、WooCommerce、LINE 整合、n8n 與 AI 自動化、客製 ERP——"
              "從規劃、開發到上線維運，一個窗口負責到底。")
@@ -221,9 +221,18 @@ def version_tuple(v: str):
         return ()
 
 
+def update_asset_names() -> list:
+    """「下載新版」要直接下載的 Release 檔名（不含版本號的固定檔名），依優先順序"""
+    if IS_MAC:
+        import platform
+        arch = "arm64" if platform.machine() == "arm64" else "x86_64"
+        return [f"MoksaWeb-ImageConverter-mac-{arch}.dmg"]
+    return ["MoksaWeb-ImageConverter-windows.exe", "MoksaWeb-ImageConverter-windows.zip"]
+
+
 def fetch_latest(timeout: float = 3.0) -> dict:
     """向 GitHub 問最新版本（只送出版本號查詢，不送任何使用者資料）。
-    回傳 {"tag", "notes", "url"}；失敗時 {"error": 說明}"""
+    回傳 {"tag", "notes", "url", "dl"}（dl＝這台電腦該下載的檔案直接網址，找不到時空字串）；失敗時 {"error": 說明}"""
     import ssl
     try:
         import certifi
@@ -236,8 +245,10 @@ def fetch_latest(timeout: float = 3.0) -> dict:
     try:
         with urllib.request.urlopen(req, timeout=timeout, context=ctx) as r:
             d = json.loads(r.read().decode("utf-8"))
+        assets = {a.get("name"): a.get("browser_download_url") for a in d.get("assets") or []}
+        dl = next((assets[n] for n in update_asset_names() if assets.get(n)), "")
         return {"tag": d.get("tag_name", ""), "notes": (d.get("body") or "").strip(),
-                "url": d.get("html_url") or UPDATE_PAGE}
+                "url": d.get("html_url") or UPDATE_PAGE, "dl": dl}
     except urllib.error.HTTPError as e:
         return {"error": f"HTTP {e.code}"}
     except Exception as e:
@@ -2507,7 +2518,8 @@ class App(RootBase):
             # 一天內查過：直接用上次查到的結果
             if s.get("update_latest"):
                 self._on_update_result({"tag": s["update_latest"], "notes": s.get("update_notes", ""),
-                                        "url": s.get("update_url") or UPDATE_PAGE}, manual=False)
+                                        "url": s.get("update_url") or UPDATE_PAGE,
+                                        "dl": s.get("update_dl", "")}, manual=False)
             return
         threading.Thread(target=lambda: self.q.put(("update", fetch_latest(), False)), daemon=True).start()
 
@@ -2529,7 +2541,7 @@ class App(RootBase):
                 lbl.configure(text="無法連線檢查更新（請確認網路），可以直接到下載頁查看。")
             return
         self.s.update(update_checked=time.time(), update_latest=res["tag"], update_notes=res["notes"],
-                      update_url=res["url"])
+                      update_url=res["url"], update_dl=res.get("dl", ""))
         save_settings(self.s)
         newer = version_tuple(res["tag"]) > version_tuple(APP_VERSION)
         if lbl is not None:
@@ -2554,7 +2566,12 @@ class App(RootBase):
         self._hide_update_bar()
 
     def _open_update_page(self):
-        webbrowser.open((self._update_info or {}).get("url") or UPDATE_PAGE)
+        """直接下載這台電腦用的檔案（Windows：exe；Mac：依晶片的 dmg）；找不到檔案才打開下載頁"""
+        info = self._update_info or {}
+        dl = info.get("dl")
+        webbrowser.open(dl or info.get("url") or UPDATE_PAGE)
+        if dl:
+            self._toast("新版開始下載，完成後在「下載」資料夾打開即可（設定會自動沿用）")
 
     def _show_update_notes(self):
         info = self._update_info or {}

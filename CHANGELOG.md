@@ -1,5 +1,9 @@
 # 版本紀錄
 
+## v1.6.4（2026-11-19）
+- 「下載新版」改成直接下載：Windows 下載新版 exe，Mac 依晶片下載對應的 .dmg，不用再到 GitHub 頁面找檔案。找不到檔案時才打開下載頁。
+- Windows 版多一個可直接下載的 exe（`MoksaWeb-ImageConverter-windows.exe`，有數位簽章），不用解壓縮；原本的 zip（含使用說明）照常提供。
+
 ## v1.6.3（2026-11-18）
 - Windows 版加上數位簽章（發行者：Open Source Developer Cheng Chun Chang，Certum 開源程式碼簽章，附時間戳記）。開著「智慧型應用程式控制」的 Windows 11 不會再被封鎖。
 - 使用說明與 README 更新第一次開啟的說明。
